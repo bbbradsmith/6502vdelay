@@ -12,6 +12,7 @@ Version 2
 ## Usage
 
 * **vdelay.s** - source code (64-65535 cycles, 174 bytes)
+* **vdelay_short.s** - short version (57-255 cycles, 135 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
@@ -22,6 +23,9 @@ The mimnimum amount of delay is currently **64 cycles**.
 
 This code must be placed in a page-aligned segment. Add **align=256** to your **CODE** segment CFG
  or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
+
+The short version only permits 57-255 cycle delays, and only takes **A** as its
+ parameter.
 
 ## Tests
 
