@@ -8,17 +8,17 @@ You might call this arbitrary delay, procedural delay, programmatic delay,
 
 Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
-Version 1
+Version 2
 
 ## Usage
 
-* **vdelay.s** - source code
+* **vdelay.s** - source code (64-65535 cycles, 174 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
 subroutine, which you call with a 16-bit value for the number of cycles to
 delay. Low bits in **A**, high bits in **X**.
 
-The mimnimum amount of delay is currently **78 cycles**. If the given parameter
+The mimnimum amount of delay is currently **64 cycles**. If the given parameter
 is less than that it will still delay that minimum number of cycles.
 
 This code must be placed in a page-aligned segment. Add **align=256** to your
@@ -38,6 +38,11 @@ The [python3](https://www.python.org/) program **test/test.py** will use **sim65
 
 The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code
  in an NES debugging emulator. 
+
+## History
+
+* Version 1 - Minimum 78 cycles, 176 bytes.
+* Version 2 - Minimum 64 cycles, 174 bytes.
 
 ## License
 

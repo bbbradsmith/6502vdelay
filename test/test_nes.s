@@ -9,7 +9,7 @@
 ; Put read breakpoints on DEBUG_START or DEBUG_END to easily find the function
 ; when it is called.
 
-START_VALUE = 78
+START_VALUE = 64
 DISPLAY = $2000 + (10 * 32) + 10
 
 ; two read addresses that can be checked in a debugger to find the delay code

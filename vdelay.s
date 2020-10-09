@@ -3,11 +3,10 @@
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
-; delays for A:X cycles, minimum: 78 (includes jsr)
+; delays for A:X cycles, minimum: 64 (includes jsr)
 ;   A = low bits of cycles to delay
 ;   X = high bits of cycles to delay
 ;   A/X/Y clobbered
-;   stack descends up to 12 bytes
 
 ; NOTE:
 ; with an "intro" jump table of 512 bytes, and a large amount of nopslide code
@@ -15,7 +14,7 @@
 ; to be worthwhile. It would look something like this:
 ; vdelay:
 ;     cpx #0
-;     bne vdelay_long
+;     bne vdelay_full
 ;     tay
 ;     lda vdelay_short_jump + 256, Y
 ;     pha
@@ -24,10 +23,8 @@
 ;     rts
 ; (the above is 38 cycles including jsr and the rts following the rts-jump)
 
-; NOTE:
-; could probably reduce VDELAY_MINIMUM by skipping the high portion for low-only
-
-VDELAY_MINIMUM = 78
+VDELAY_MINIMUM = 64
+VDELAY_FULL_OVERHEAD = 77
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -65,70 +62,66 @@ vdelay_low_jump_msb:
 .assert >* = >vdelay_low_jump_msb, error, "Jump table page crossed!"
 
 vdelay: ;                                +6 = 6 (jsr)
-	; subtract overhead from target
-	sec                                ; +2 = 8
-	sbc #VDELAY_MINIMUM                ; +2 = 10
-	tay                                ; +2 = 12
-	txa                                ; +2 = 14
-	sbc #0                             ; +2 = 16
-	BRPAGE bcc, vdelay_toolow          ; +2 = 18 (branch)
-	tax                                ; +2 = 20
-	; Y = low-cycles (1 each)
-	; X = high-cycles (256 each)
-	tya                                ; +2 = 22
-	BRPAGE bne, vdelay_low             ; +2 = 24 (branch)
-	jsr vdelay_24                      ;+40 = 64
-	jsr vdelay_12
-	nop
-	nop
-	jmp vdelay_high                    ; +3 = 67
+	cpx #0                             ; +2 = 8
+	bne vdelay_full                    ; +2 = 10
+	sec                                ; +2 = 12
+	sbc #VDELAY_MINIMUM                ; +2 = 14
+	BRPAGE bcc, vdelay_toolow          ; +2 = 16
 
-vdelay_low:                            ; +3 = 25 (bne)
-	pha                                ; +3 = 28
-	and #7                             ; +2 = 30
-	tay                                ; +2 = 32
-	lda vdelay_low_jump_msb, Y         ; +4 = 36
-	pha                                ; +3 = 39
-	lda vdelay_low_jump_lsb, Y         ; +4 = 43
-	pha                                ; +3 = 46
-	sec                                ; +2 = 48
-	rts                                ; +6 = 54 (rts-jump)
+vdelay_low:                            ;           29 (full path)
+	pha                                ; +3 = 19 / 32 (low only / full path)
+	and #7                             ; +2 = 21 / 34
+	tay                                ; +2 = 23 / 36
+	lda vdelay_low_jump_msb, Y         ; +4 = 27 / 40
+	pha                                ; +3 = 30 / 43
+	lda vdelay_low_jump_lsb, Y         ; +4 = 34 / 47
+	pha                                ; +3 = 37 / 50
+	sec                                ; +2 = 39 / 52
+	rts                                ; +6 = 45 / 58
 
-vdelay_low_rest:                       ;+10 = 64 (returning from jump table)
+vdelay_low_rest:                       ;+10 = 55 / 68 (returning from jump table)
 	; A = remaining cycles to burn, truncated to nearest 8
 	; Z flag matches A
-	BRPAGE beq, vdelay_low_none        ; +2 = 66
+	BRPAGE beq, vdelay_low_none        ; +2 = 57 / 70
 	: ; 8 cycles each iteration
-		sbc #8
-		NOP3
-		BRPAGE bne, :-                 ; -1 = 65 (on last iteration)
-	nop                                ; +2 = 67
-vdelay_low_none:                       ; +3 = 67 (+3 if from branch)
+		sbc #8         ;  +2 = 2
+		NOP3           ;  +3 = 5
+		BRPAGE bne, :- ;  +3 = 8         -1 = 56 / 69 (on last iteration)
+	nop                                ; +2 = 58 / 71
+vdelay_low_none:                       ; +3 = 58 / 71 (from branch)
+	rts                                ; +6 = 64 / 77
 
-vdelay_high:                           ;    = 67 (from all paths)
-	cpx #0                             ; +2 = 69
-	BRPAGE beq, vdelay_end             ; +2 = 71
+vdelay_toolow:                         ; +3 = 17 (
+	jsr vdelay_24                      ;+24 = 41
+	jsr vdelay_12                      ;+12 = 53
+	NOP3                               ; +3 = 56
+	nop                                ; +2 = 58
+	rts                                ; +6 = 64
+
+vdelay_full:                           ; +3 = 11
+	sec                                ; +2 = 13
+	sbc #VDELAY_FULL_OVERHEAD          ; +2 = 15
+	tay                                ; +2 = 17
+	txa                                ; +2 = 19
+	sbc #0                             ; +2 = 21
+	BRPAGE beq, vdelay_high_none       ; +2 = 23
 	: ; 256 cycles each iteration
-		txa          ;  +2 = 2
-		pha          ;  +3 = 5
-		ldx #0       ;  +2 = 7
-		lda #236     ;  +2 = 9
-		jsr vdelay   ;+236 = 245
-		pla          ;  +4 = 249
-		tax          ;  +2 = 251
-		dex          ;  +2 = 253
-		BRPAGE bne, :-                 ; -1 = 70 (on last iteration)
-		nop                            ; +2 = 72
-
-vdelay_end:                            ;    = 72 (from all paths)
-	rts                                ; +6 = 78
-
-; if given delay < 78 then 
-vdelay_toolow:                         ; +3 = 19
-	jsr vdelay_48                      ;+53 = 72
-	nop
-	NOP3
-	rts                                ; +6 = 78
+		pha            ;  +3 = 3
+		tya            ;  +2 = 5
+		pha            ;  +3 = 8
+		ldx #0         ;  +2 = 10
+		lda #(256-29)  ;  +2 = 12
+		jsr vdelay
+		pla            ;  +4 = 16
+		tay            ;  +2 = 18
+		pla            ;  +4 = 22
+		sec            ;  +2 = 24
+		sbc #1         ;  +2 = 26
+		BRPAGE bne, :- ;  +3 = 29        -1 = 22 (on last iteration)
+		nop                            ; +2 = 24
+vdelay_high_none:                      ; +3 = 24 (from branch)
+	tya                                ; +2 = 26
+	jmp vdelay_low                     ; +3 = 29
 
 ; each of these is 10 cycles + 0-7 cycles
 ; carry is set on entry, and Z is set to A on return
@@ -183,6 +176,5 @@ vdelay_low7:
 	jmp vdelay_low_rest
 
 ; a few compact delays
-vdelay_48: jsr vdelay_24
 vdelay_24: jsr vdelay_12
 vdelay_12: rts

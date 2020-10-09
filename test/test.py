@@ -16,9 +16,14 @@
 #   4. A final count of 65536 tests.
 # This indicates that up to the minimum, all inputs give the same delay,
 # and after the minimum it increases by 1 cycle for each test.
+#
+# You can press CTRL+C while the batch file is running to stop the test run,
+# which will analyze the partially generated log.
 
 import os
 import subprocess
+
+skip_run = False # True to test a partial log already generated
 
 bat = "temp\\test.bat"
 log = "temp\\test.log"
@@ -26,9 +31,14 @@ run = "cc65\\bin\\sim65 -c temp\\test.bin"
 
 try:
     os.remove(bat)
-    os.remove(log)
 except:
     pass
+
+if not skip_run:
+    try:
+        os.remove(log)
+    except:
+        pass
 
 s = ""
 for i in range(0,65536):
@@ -38,7 +48,8 @@ f = open(bat,"wt")
 f.write(s)
 f.close()
 
-subprocess.call(bat)
+if not skip_run:
+    subprocess.call(bat)
 
 count = 0
 last = 0
