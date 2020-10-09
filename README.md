@@ -2,9 +2,8 @@
 
 A 6502 delay routine for delaying a number of cycles specified at runtime.
 
-You might call this arbitrary delay, procedural delay, programmatic delay,
- variable delay, etc. It might be handy in situations where you have a 6502
- without effective dimer hardware (e.g. Apple II, NES).
+You might call this arbitrary delay, procedural delay, programmatic delay, variable delay, dial-a-delay etc.
+ It might be handy in situations where you have a 6502 without effective dimer hardware (e.g. Apple II, NES).
 
 Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
@@ -15,15 +14,14 @@ Version 2
 * **vdelay.s** - source code (64-65535 cycles, 174 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
-subroutine, which you call with a 16-bit value for the number of cycles to
-delay. Low bits in **A**, high bits in **X**.
+ subroutine, which you call with a 16-bit value for the number of cycles to delay.
+ Low bits in **A**, high bits in **X**.
 
-The mimnimum amount of delay is currently **64 cycles**. If the given parameter
-is less than that it will still delay that minimum number of cycles.
+The mimnimum amount of delay is currently **64 cycles**.
+ If the given parameter is less than that it will still delay that minimum number of cycles.
 
-This code must be placed in a page-aligned segment. Add **align=256** to your
-**CODE** segment CFG or add a **.segment** directive of your own to place it in
-a custom segment that is appropriately aligned.
+This code must be placed in a page-aligned segment. Add **align=256** to your **CODE** segment CFG
+ or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
 
 ## Tests
 
