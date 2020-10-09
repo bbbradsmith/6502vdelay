@@ -21,6 +21,10 @@ delay. Low bits in **A**, high bits in **X**.
 The mimnimum amount of delay is currently **78 cycles**. If the given parameter
 is less than that it will still delay that minimum number of cycles.
 
+This code must be placed in a page-aligned segment. Add **align=256** to your
+**CODE** segment CFG or add a **.segment** directive of your own to place it in
+a custom segment that is appropriately aligned.
+
 ## Tests
 
 Place **cc65** in **test/cc65** and create a **test/temp** folder.
