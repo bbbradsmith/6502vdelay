@@ -65,14 +65,13 @@ vdelay_low_none:                       ; +3 = 50 (from branch)
 	rts                                ; +6 = 56
 
 vdelay_toolow:                         ; +3 = 13 (from branch)
-	ldy #6                             ; +2 = 15
-	: ; 5 cycle loop                    +30 = 45
+	ldy #4                             ; +2 = 15
+	: ; 9 cycle loop                    +36 = 51
+		nop
+		nop
 		dey
-		BRPAGE bne, :-                 ; -1 = 44 (on last iteration)
+		BRPAGE bne, :-                 ; -1 = 50 (on last iteration)
 	.assert (*-vdelay_low_jump_lsb)<128, error, "Last branch does not fit alignment?"
-	nop                                ; +6 = 50
-	nop
-	nop
 	rts                                ; +6 = 56
 
 ; each of these is 5 cycles +  0-7 cycles
