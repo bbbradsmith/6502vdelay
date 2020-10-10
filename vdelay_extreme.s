@@ -60,7 +60,7 @@ vdelay_low_jump_msb:
 
 vdelay: ;                                +6 = 6 (jsr)
 	cpx #0                             ; +2 = 8
-	bne vdelay_full                    ; +2 = 10
+	BRPAGE bne, vdelay_full            ; +2 = 10
 	tay                                ; +2 = 12
 	lda vdelay_intro_msb, Y            ; +4 = 16
 	pha                                ; +3 = 19
@@ -174,10 +174,16 @@ vdelay_low7:
 .repeat 108, I ; evens
 .ident(.sprintf("vdelay_intro%d",254-(I*2))): nop
 .endrepeat
+;...
+;vdelay_intro42: nop
+;vdelay_intro40: nop
 	rts
 .repeat 107, I ; odds
 .ident(.sprintf("vdelay_intro%d",255-(I*2))): nop
 .endrepeat
+;...
+;vdelay_intro45: nop
+;vdelay_intro43: nop
 vdelay_intro41: NOP3
 	rts
 .repeat 40, I ; below minimum
