@@ -27,7 +27,7 @@ The minimum amount of delay is currently **63 cycles**.
 This code must be placed in a 128-byte-aligned segment. Add **align=128** to your **CODE** segment CFG
  or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
 
-The "short" version only permits 56-255 cycle delays, and only takes **A** as its
+The "short" version only permits 56-255 cycle delays, and only takes A as its
  parameter.
 
 The "extreme" version has a lower minimum of 40 cycles, but is much larger, requiring 837 bytes, and 256-byte alignment.
