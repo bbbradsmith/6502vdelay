@@ -43,7 +43,7 @@ vdelay_low_jump_msb:
 
 vdelay: ;                                +6 = 6 (jsr)
 	cpx #0                             ; +2 = 8
-	bne vdelay_full                    ; +2 = 10
+	BRPAGE bne, vdelay_full            ; +2 = 10
 	sec                                ; +2 = 12
 	sbc #VDELAY_MINIMUM                ; +2 = 14
 	BRPAGE bcc, vdelay_toolow          ; +2 = 16
