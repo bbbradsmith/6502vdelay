@@ -4,7 +4,7 @@
 
 .export vdelay
 ; delays for A cycles, minimum: 57 (includes jsr)
-;   A = low bits of cycles to delay
+;   A = cycles to delay
 ;   A/X/Y clobbered
 
 VDELAY_MINIMUM = 57
@@ -20,7 +20,7 @@ VDELAY_MINIMUM = 57
 	jmp *+3
 .endmacro
 
-.align 256
+.align 128 ; this code has no branches after 128 bytes
 
 ; jump table
 vdelay_low_jump_lsb:
@@ -71,6 +71,7 @@ vdelay_low_none:                       ; +3 = 51 (from branch)
 	rts                                ; +6 = 57
 
 vdelay_toolow:                         ; +3 = 13 (from branch)
+	.assert (*-vdelay_low_jump_lsb)<128, error, "Last branch does not fit alignment?"
 	jsr vdelay_24                      ;+24 = 37
 	jsr vdelay_12                      ;+12 = 49
 	nop                                ; +2 = 51

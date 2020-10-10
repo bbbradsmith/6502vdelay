@@ -9,11 +9,16 @@
 @del temp\test_nes.dbg
 @del temp\test_nes.nes
 
+REM if you wish to test alternative versions, uncomment them to replace vdelay.s
+
 cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay.s
 @IF ERRORLEVEL 1 GOTO error
 
 REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_short.s
-REM @IF ERRORLEVEL 1 GOTO error
+@IF ERRORLEVEL 1 GOTO error
+
+REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_compact.s
+@IF ERRORLEVEL 1 GOTO error
 
 cc65\bin\ca65 -o temp\test.o -g test.s
 @IF ERRORLEVEL 1 GOTO error
