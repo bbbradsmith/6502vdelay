@@ -118,7 +118,7 @@ vdelay_high_none:                      ; +3 = 24 (from branch)
 	tya                                ; +2 = 26
 	jmp vdelay_low                     ; +3 = 29
 
-; each of these is 5 cycles +  0-7 cycles
+; each of these is 5 cycles + 0-7 cycles
 vdelay_low6: nop
 vdelay_low4: nop
 vdelay_low2: nop

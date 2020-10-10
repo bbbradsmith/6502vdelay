@@ -74,7 +74,7 @@ vdelay_toolow:                         ; +3 = 13 (from branch)
 	.assert (*-vdelay_low_jump_lsb)<128, error, "Last branch does not fit alignment?"
 	rts                                ; +6 = 56
 
-; each of these is 5 cycles +  0-7 cycles
+; each of these is 5 cycles + 0-7 cycles
 vdelay_low6: nop
 vdelay_low4: nop
 vdelay_low2: nop
