@@ -87,13 +87,11 @@ vdelay_full:                           ; +3 = 11
 	sbc #0                             ; +2 = 21
 	BRPAGE beq, vdelay_high_none       ; +2 = 23
 	: ; 256 cycles each iteration
-		ldx #49            ; +2 = 2
-		: ; 5 cycle loop   +245 = 247
+		ldx #50            ; +2 = 2
+		: ; 5 cycle loop   +250 = 252
 			dex
-			BRPAGE bne, :- ; -1 = 246
-		BRPAGE beq, *+2    ; +3 = 249
-		sec                ; +2 = 251
-		sbc #1             ; +2 = 253
+			BRPAGE bne, :- ; -1 = 251
+		sbc #1             ; +2 = 253 (carry always set)
 		BRPAGE bne, :--    ; +3 = 256    -1 = 22 (on last iteration)
 	nop                                ; +2 = 24
 vdelay_high_none:                      ; +3 = 24 (from branch)
