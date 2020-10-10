@@ -88,7 +88,7 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_short - 56, 80.
   * vdelay_compact - obsoleted.
   * vdelay_extreme - 40, 837.
-* Version 6
+* Version 5
   * vdelay - 63, 98.
   * vdelay_short - 56, 71.
   * vdelay_extreme - 40, 827.
