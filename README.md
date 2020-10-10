@@ -71,7 +71,7 @@ The "extreme" version uses a large intro table and nopslide to achieve a 40 cycl
  but I hope these examples might give an idea for those that need to go further.
 
 If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time)
- you may find Bisqwit's "fixed-cycle delay code vending machine" useful:
+ you may find Bisqwit's *fixed-cycle delay code vending machine* useful:
 
 * [https://bisqwit.iki.fi/utils/nesdelay.php](https://bisqwit.iki.fi/utils/nesdelay.php)
 
