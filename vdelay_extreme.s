@@ -9,7 +9,7 @@
 ;   A/X/Y clobbered
 
 VDELAY_MINIMUM = 40
-VDELAY_FULL_OVERHEAD = 77
+VDELAY_FULL_OVERHEAD = 76
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -29,11 +29,17 @@ vdelay_intro_lsb:
 	.repeat 256, I
 		.byte <(.ident(.sprintf("vdelay_intro%d",I))-1)
 	.endrepeat
+	; byte <(vdelay_intro0-1)
+	; byte <(vdelay_intro1-1)
+	; ...
 	.assert >(*-1) = >vdelay_intro_lsb, error, "Jump table page crossed!"
 vdelay_intro_msb:
 	.repeat 256, I
 		.byte >(.ident(.sprintf("vdelay_intro%d",I))-1)
 	.endrepeat
+	; byte >(vdelay_intro0-1)
+	; byte >(vdelay_intro1-1)
+	; ...
 	.assert >(*-1) = >vdelay_intro_msb, error, "Jump table page crossed!"
 
 ; jump table for vdelay_full
@@ -77,20 +83,19 @@ vdelay_low:                            ;           29 (full path)
 	pha                                ; +3 = 30 / 43
 	lda vdelay_low_jump_lsb, Y         ; +4 = 34 / 47
 	pha                                ; +3 = 37 / 50
-	sec                                ; +2 = 39 / 52
-	rts                                ; +6 = 45 / 58
+	rts                                ; +6 = 43 / 56
 
-vdelay_low_rest:                       ;+10 = 55 / 68 (returning from jump table)
-	; A = remaining cycles to burn, truncated to nearest 8
-	; Z flag matches A
-	BRPAGE beq, vdelay_low_none        ; +2 = 57 / 70
+vdelay_low_rest:                       ; +5 = 48 / 61 (returning from jump table)
+	pla                                ; +4 = 52 / 65
+	and #$F8                           ; +2 = 54 / 67
+	BRPAGE beq, vdelay_low_none        ; +2 = 56 / 69
 	: ; 8 cycles each iteration
 		sbc #8         ;  +2 = 2
 		NOP3           ;  +3 = 5
-		BRPAGE bne, :- ;  +3 = 8         -1 = 56 / 69 (on last iteration)
-	nop                                ; +2 = 58 / 71
-vdelay_low_none:                       ; +3 = 58 / 71 (from branch)
-	rts                                ; +6 = 64 / 77
+		BRPAGE bne, :- ;  +3 = 8         -1 = 55 / 68 (on last iteration)
+	nop                                ; +2 = 57 / 70
+vdelay_low_none:                       ; +3 = 57 / 70 (from branch)
+	rts                                ; +6 = 63 / 76
 
 vdelay_full:                           ; +3 = 11
 	sec                                ; +2 = 13
@@ -118,59 +123,20 @@ vdelay_high_none:                      ; +3 = 24 (from branch)
 	tya                                ; +2 = 26
 	jmp vdelay_low                     ; +3 = 29
 
-; each of these is 10 cycles + 0-7 cycles
-; carry is set on entry, and Z is set to A on return
-; their job is to get the remaining delay cycles to a multiple of 8,
-; and adjust A to compensate
-vdelay_low0:
-	pla                       ; +4
-	; no sbc                  ; -2
-	NOP3
-	jmp vdelay_low_rest       ; +3
-vdelay_low1:
-	pla                       ; +4
-	sbc #1                    ; +2
-	nop
-	jmp vdelay_low_rest       ; +3
-vdelay_low2:
-	pla
-	sbc #2
-	NOP3
+; each of these is 5 cycles +  0-7 cycles
+vdelay_low6: nop
+vdelay_low4: nop
+vdelay_low2: nop
+vdelay_low0: nop
 	jmp vdelay_low_rest
-vdelay_low3:
-	pla
-	sbc #3
-	nop
-	nop
-	jmp vdelay_low_rest
-vdelay_low4:
-	pla
-	sbc #4
-	nop
-	NOP3
-	jmp vdelay_low_rest
-vdelay_low5:
-	pla
-	sbc #5
-	NOP3
-	NOP3
-	jmp vdelay_low_rest
-vdelay_low6:
-	pla
-	sbc #6
-	nop
-	nop
-	NOP3
-	jmp vdelay_low_rest
-vdelay_low7:
-	pla
-	sbc #7
-	nop
-	NOP3
-	NOP3
+vdelay_low7: nop
+vdelay_low5: nop
+vdelay_low3: nop
+vdelay_low1: NOP3
 	jmp vdelay_low_rest
 
 ; intro nopslides
+
 .repeat 108, I ; evens
 .ident(.sprintf("vdelay_intro%d",254-(I*2))): nop
 .endrepeat
@@ -178,6 +144,7 @@ vdelay_low7:
 ;vdelay_intro42: nop
 ;vdelay_intro40: nop
 	rts
+
 .repeat 107, I ; odds
 .ident(.sprintf("vdelay_intro%d",255-(I*2))): nop
 .endrepeat
@@ -186,6 +153,10 @@ vdelay_low7:
 ;vdelay_intro43: nop
 vdelay_intro41: NOP3
 	rts
+
 .repeat 40, I ; below minimum
 .ident(.sprintf("vdelay_intro%d",I)) = vdelay_intro40
 .endrepeat
+;vdelay_intro_0 = vdelay_intro40
+;vdelay_intro_1 = vdelay_intro40
+;...

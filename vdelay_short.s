@@ -3,11 +3,11 @@
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
-; delays for A cycles, minimum: 57 (includes jsr)
+; delays for A cycles, minimum: 56 (includes jsr)
 ;   A = cycles to delay
 ;   A/X/Y clobbered
 
-VDELAY_MINIMUM = 57
+VDELAY_MINIMUM = 56
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -55,78 +55,41 @@ vdelay: ;                                +6 = 6 (jsr)
 	pha                                ; +3 = 25
 	lda vdelay_low_jump_lsb, Y         ; +4 = 29
 	pha                                ; +3 = 32
-	sec                                ; +2 = 34
-	rts                                ; +6 = 40
+	rts                                ; +6 = 38
 
-vdelay_low_rest:                       ; +8 = 48
-	; A = remaining cycles to burn, truncated to nearest 8
-	; Z flag matches A
-	BRPAGE beq, vdelay_low_none        ; +2 = 50
+vdelay_low_rest:                       ; +5 = 43
+	txa                                ; +2 = 45
+	and #$F8                           ; +2 = 47
+	BRPAGE beq, vdelay_low_none        ; +2 = 49
 	: ; 8 cycles each iteration
 		sbc #8         ;  +2 = 2
 		NOP3           ;  +3 = 5
-		BRPAGE bne, :- ;  +3 = 8         -1 = 49 (on last iteration)
-	nop                                ; +2 = 51
-vdelay_low_none:                       ; +3 = 51 (from branch)
-	rts                                ; +6 = 57
+		BRPAGE bne, :- ;  +3 = 8         -1 = 48 (on last iteration)
+	nop                                ; +2 = 50
+vdelay_low_none:                       ; +3 = 50 (from branch)
+	rts                                ; +6 = 56
 
 vdelay_toolow:                         ; +3 = 13 (from branch)
 	.assert (*-vdelay_low_jump_lsb)<128, error, "Last branch does not fit alignment?"
 	jsr vdelay_24                      ;+24 = 37
-	jsr vdelay_12                      ;+12 = 49
-	nop                                ; +2 = 51
-	rts                                ; +6 = 57
+	nop                                ;+13 = 50
+	nop
+	nop
+	nop
+	nop
+	NOP3
+	rts                                ; +6 = 56
 
-; each of these is 8 cycles + 0-7 cycles
-; carry is set on entry, and Z is set to A on return
-; their job is to get the remaining delay cycles to a multiple of 8,
-; and adjust A to compensate
-vdelay_low0:
-	txa                       ; +2
-	; no sbc                  ; -2
-	NOP3
-	jmp vdelay_low_rest       ; +3
-vdelay_low1:
-	txa                       ; +2
-	sbc #1                    ; +2
-	nop
-	jmp vdelay_low_rest       ; +3
-vdelay_low2:
-	txa
-	sbc #2
-	NOP3
+; each of these is 5 cycles +  0-7 cycles
+vdelay_low6: nop
+vdelay_low4: nop
+vdelay_low2: nop
+vdelay_low0: nop
 	jmp vdelay_low_rest
-vdelay_low3:
-	txa
-	sbc #3
-	nop
-	nop
-	jmp vdelay_low_rest
-vdelay_low4:
-	txa
-	sbc #4
-	nop
-	NOP3
-	jmp vdelay_low_rest
-vdelay_low5:
-	txa
-	sbc #5
-	NOP3
-	NOP3
-	jmp vdelay_low_rest
-vdelay_low6:
-	txa
-	sbc #6
-	nop
-	nop
-	NOP3
-	jmp vdelay_low_rest
-vdelay_low7:
-	txa
-	sbc #7
-	nop
-	NOP3
-	NOP3
+vdelay_low7: nop
+vdelay_low5: nop
+vdelay_low3: nop
+vdelay_low1: NOP3
 	jmp vdelay_low_rest
 
 ; a few compact delays

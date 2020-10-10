@@ -7,20 +7,19 @@ You might call this arbitrary delay, procedural delay, programmatic delay, varia
 
 Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
-Version 3
+Version 4
 
 ## Usage
 
-* **vdelay.s** - normal version (64-65535 cycles, 174 bytes)
-* **vdelay_short.s** - short version (57-255 cycles, 135 bytes)
-* **vdelay_compact.s** - compact version (72-65535 cycles, 144 bytes)
-* **vdelay_extreme.s** - extreme version (40-65535 cycles, 896 bytes)
+* **vdelay.s** - normal version (63-65535 cycles, 113 bytes)
+* **vdelay_short.s** - short version (56-255 cycles, 80 bytes)
+* **vdelay_extreme.s** - extreme version (40-65535 cycles, 837 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
  Low bits in **A**, high bits in **X**.
 
-The minimum amount of delay is currently **64 cycles**.
+The minimum amount of delay is currently **63 cycles**.
  If the given parameter is less than that it will still delay that minimum number of cycles.
  The cycle count includes the jsr/rts of the subroutine call,
  though you will probably need to account for a few extra cycles to load A/X before calling.
@@ -28,12 +27,10 @@ The minimum amount of delay is currently **64 cycles**.
 This code must be placed in a 128-byte-aligned segment. Add **align=128** to your **CODE** segment CFG
  or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
 
-The "short" version only permits 57-255 cycle delays, and only takes **A** as its
+The "short" version only permits 56-255 cycle delays, and only takes **A** as its
  parameter.
 
-The "compact" version has a higher minimum of 72 cycles, but is slightly smaller at 144 bytes.
-
-The "extreme" version has a lower minimum of 40 cycles, but is much larger, requiring 896 bytes, and 256-byte alignment.
+The "extreme" version has a lower minimum of 40 cycles, but is much larger, requiring 837 bytes, and 256-byte alignment.
 
 ## Tests
 
@@ -86,6 +83,11 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_short - 57-255, 135.
   * vdelay_compact - 72, 144.
   * vdelay_extreme - 40, 896.
+* Version 4
+  * vdelay - 63, 113.
+  * vdelay_short - 56, 80.
+  * vdelay_compact - obsoleted.
+  * vdelay_extreme - 40, 837.
 
 ## License
 
