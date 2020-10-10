@@ -94,7 +94,7 @@ vdelay_full:                           ; +3 = 11
 		BRPAGE beq, *+2    ; +3 = 249
 		sec                ; +2 = 251
 		sbc #1             ; +2 = 253
-		BRPAGE bne, :-     ; +3 = 256    -1 = 22 (on last iteration)
+		BRPAGE bne, :--    ; +3 = 256    -1 = 22 (on last iteration)
 		nop                            ; +2 = 24
 vdelay_high_none:                      ; +3 = 24 (from branch)
 	.assert (*-vdelay_low_jump_lsb)<128, error, "Last branch does not fit alignment?"
