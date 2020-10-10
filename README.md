@@ -7,13 +7,13 @@ You might call this arbitrary delay, procedural delay, programmatic delay, varia
 
 Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
-Version 4
+Version 5
 
 ## Usage
 
-* **vdelay.s** - normal version (63-65535 cycles, 113 bytes)
-* **vdelay_short.s** - short version (56-255 cycles, 80 bytes)
-* **vdelay_extreme.s** - extreme version (40-65535 cycles, 837 bytes)
+* **vdelay.s** - normal version (63-65535 cycles, 107 bytes)
+* **vdelay_short.s** - short version (56-255 cycles, 72 bytes)
+* **vdelay_extreme.s** - extreme version (40-65535 cycles, 836 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
@@ -88,6 +88,10 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_short - 56, 80.
   * vdelay_compact - obsoleted.
   * vdelay_extreme - 40, 837.
+* Version 6
+  * vdelay - 63, 107.
+  * vdelay_short - 56, 72.
+  * vdelay_extreme - 40, 836.
 
 ## License
 

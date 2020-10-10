@@ -17,11 +17,6 @@ VDELAY_FULL_OVERHEAD = 76
 	.assert >(label_) = >*, error, "Page crossed!"
 .endmacro
 
-; 3 cycle "nop" that does not alter flags
-.macro NOP3
-	jmp *+3
-.endmacro
-
 .align 256
 
 ; jump table for vdelay_intro
@@ -90,9 +85,9 @@ vdelay_low_rest:                       ; +5 = 48 / 61 (returning from jump table
 	and #$F8                           ; +2 = 54 / 67
 	BRPAGE beq, vdelay_low_none        ; +2 = 56 / 69
 	: ; 8 cycles each iteration
-		sbc #8         ;  +2 = 2
-		NOP3           ;  +3 = 5
-		BRPAGE bne, :- ;  +3 = 8         -1 = 55 / 68 (on last iteration)
+		sbc #8          ; +2 = 2
+		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
+		BRPAGE bne, :-  ; +3 = 8         -1 = 55 / 68 (on last iteration)
 	nop                                ; +2 = 57 / 70
 vdelay_low_none:                       ; +3 = 57 / 70 (from branch)
 	rts                                ; +6 = 63 / 76
@@ -132,7 +127,7 @@ vdelay_low0: nop
 vdelay_low7: nop
 vdelay_low5: nop
 vdelay_low3: nop
-vdelay_low1: NOP3
+vdelay_low1: jmp *+3
 	jmp vdelay_low_rest
 
 ; intro nopslides
@@ -151,7 +146,7 @@ vdelay_low1: NOP3
 ;...
 ;vdelay_intro45: nop
 ;vdelay_intro43: nop
-vdelay_intro41: NOP3
+vdelay_intro41: jmp *+3
 	rts
 
 .repeat 40, I ; below minimum

@@ -17,11 +17,6 @@ VDELAY_FULL_OVERHEAD = 76
 	.assert >(label_) = >*, error, "Page crossed!"
 .endmacro
 
-; 3 cycle "nop" that does not alter flags
-.macro NOP3
-	jmp *+3
-.endmacro
-
 .align 128
 
 ; jump table
@@ -68,16 +63,18 @@ vdelay_low_rest:                       ; +5 = 48 / 61 (returning from jump table
 	and #$F8                           ; +2 = 54 / 67
 	BRPAGE beq, vdelay_low_none        ; +2 = 56 / 69
 	: ; 8 cycles each iteration
-		sbc #8         ;  +2 = 2
-		NOP3           ;  +3 = 5
-		BRPAGE bne, :- ;  +3 = 8         -1 = 55 / 68 (on last iteration)
+		sbc #8          ; +2 = 2
+		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
+		BRPAGE bne, :-  ; +3 = 8         -1 = 55 / 68 (on last iteration)
 	nop                                ; +2 = 57 / 70
 vdelay_low_none:                       ; +3 = 57 / 70 (from branch)
 	rts                                ; +6 = 63 / 76
 
 vdelay_toolow:                         ; +3 = 17 (from branch)
-	jsr vdelay_24                      ;+24 = 41
-	jsr vdelay_12                      ;+12 = 53
+	ldy #7                             ; +2 = 19
+	: ; 5 cycle loop                    +35 = 54
+		dey
+		BRPAGE bne, :-                 ; -1 = 53 (on last iteration)
 	nop                                ; +2 = 55
 	nop                                ; +2 = 57
 	rts                                ; +6 = 63
@@ -108,7 +105,7 @@ vdelay_high_none:                      ; +3 = 24 (from branch)
 	tya                                ; +2 = 26
 	jmp vdelay_low                     ; +3 = 29
 
-; each of these is 5 cycles +  0-7 cycles
+; each of these is 5 cycles + 0-7 cycles
 vdelay_low6: nop
 vdelay_low4: nop
 vdelay_low2: nop
@@ -117,9 +114,5 @@ vdelay_low0: nop
 vdelay_low7: nop
 vdelay_low5: nop
 vdelay_low3: nop
-vdelay_low1: NOP3
+vdelay_low1: jmp *+3
 	jmp vdelay_low_rest
-
-; a few compact delays
-vdelay_24: jsr vdelay_12
-vdelay_12: rts

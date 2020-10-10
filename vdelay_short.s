@@ -15,11 +15,6 @@ VDELAY_MINIMUM = 56
 	.assert >(label_) = >*, error, "Page crossed!"
 .endmacro
 
-; 3 cycle "nop" that does not alter flags
-.macro NOP3
-	jmp *+3
-.endmacro
-
 .align 128 ; this code has no branches after 128 bytes
 
 ; jump table
@@ -62,22 +57,22 @@ vdelay_low_rest:                       ; +5 = 43
 	and #$F8                           ; +2 = 47
 	BRPAGE beq, vdelay_low_none        ; +2 = 49
 	: ; 8 cycles each iteration
-		sbc #8         ;  +2 = 2
-		NOP3           ;  +3 = 5
-		BRPAGE bne, :- ;  +3 = 8         -1 = 48 (on last iteration)
+		sbc #8          ; +2 = 2
+		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
+		BRPAGE bne, :-  ; +3 = 8         -1 = 48 (on last iteration)
 	nop                                ; +2 = 50
 vdelay_low_none:                       ; +3 = 50 (from branch)
 	rts                                ; +6 = 56
 
 vdelay_toolow:                         ; +3 = 13 (from branch)
+	ldy #6                             ; +2 = 15
+	: ; 5 cycle loop                    +30 = 45
+		dey
+		BRPAGE bne, :-                 ; -1 = 44 (on last iteration)
 	.assert (*-vdelay_low_jump_lsb)<128, error, "Last branch does not fit alignment?"
-	jsr vdelay_24                      ;+24 = 37
-	nop                                ;+13 = 50
+	nop                                ; +6 = 50
 	nop
 	nop
-	nop
-	nop
-	NOP3
 	rts                                ; +6 = 56
 
 ; each of these is 5 cycles +  0-7 cycles
@@ -89,9 +84,5 @@ vdelay_low0: nop
 vdelay_low7: nop
 vdelay_low5: nop
 vdelay_low3: nop
-vdelay_low1: NOP3
+vdelay_low1: jmp *+3
 	jmp vdelay_low_rest
-
-; a few compact delays
-vdelay_24: jsr vdelay_12
-vdelay_12: rts
