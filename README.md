@@ -11,7 +11,7 @@ Version 5
 
 ## Usage
 
-* **vdelay.s** - normal version (63-65535 cycles, 107 bytes)
+* **vdelay.s** - normal version (63-65535 cycles, 101 bytes)
 * **vdelay_short.s** - short version (56-255 cycles, 71 bytes)
 * **vdelay_extreme.s** - extreme version (40-65535 cycles, 836 bytes)
 
@@ -89,7 +89,7 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_compact - obsoleted.
   * vdelay_extreme - 40, 837.
 * Version 6
-  * vdelay - 63, 107.
+  * vdelay - 63, 101.
   * vdelay_short - 56, 71.
   * vdelay_extreme - 40, 836.
 
