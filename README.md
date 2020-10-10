@@ -13,7 +13,7 @@ Version 5
 
 * **vdelay.s** - normal version (63-65535 cycles, 101 bytes)
 * **vdelay_short.s** - short version (56-255 cycles, 71 bytes)
-* **vdelay_extreme.s** - extreme version (40-65535 cycles, 836 bytes)
+* **vdelay_extreme.s** - extreme version (40-65535 cycles, 830 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
@@ -91,7 +91,7 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
 * Version 6
   * vdelay - 63, 101.
   * vdelay_short - 56, 71.
-  * vdelay_extreme - 40, 836.
+  * vdelay_extreme - 40, 830.
 
 ## License
 

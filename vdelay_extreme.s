@@ -100,19 +100,15 @@ vdelay_full:                           ; +3 = 11
 	sbc #0                             ; +2 = 21
 	BRPAGE beq, vdelay_high_none       ; +2 = 23
 	: ; 256 cycles each iteration
-		pha            ;  +3 = 3
-		tya            ;  +2 = 5
-		pha            ;  +3 = 8
-		ldx #0         ;  +2 = 10
-		lda #(256-29)  ;  +2 = 12
-		jsr vdelay
-		pla            ;  +4 = 16
-		tay            ;  +2 = 18
-		pla            ;  +4 = 22
-		sec            ;  +2 = 24
-		sbc #1         ;  +2 = 26
-		BRPAGE bne, :- ;  +3 = 29        -1 = 22 (on last iteration)
-		nop                            ; +2 = 24
+		ldx #49            ; +2 = 2
+		: ; 5 cycle loop   +245 = 247
+			dex
+			BRPAGE bne, :- ; -1 = 246
+		BRPAGE beq, *+2    ; +3 = 249
+		sec                ; +2 = 251
+		sbc #1             ; +2 = 253
+		BRPAGE bne, :--    ; +3 = 256    -1 = 22 (on last iteration)
+	nop                                ; +2 = 24
 vdelay_high_none:                      ; +3 = 24 (from branch)
 	.assert (*-vdelay_low_jump_lsb)<128, error, "Last branch does not fit alignment?"
 	tya                                ; +2 = 26
