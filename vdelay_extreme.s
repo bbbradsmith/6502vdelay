@@ -47,7 +47,7 @@ vdelay_low_jump_lsb:
 	.byte <(vdelay_low5-1)
 	.byte <(vdelay_low6-1)
 	.byte <(vdelay_low7-1)
-	.assert >* = >vdelay_low_jump_lsb, error, "Jump table page crossed!"
+	.assert >(*-1) = >vdelay_low_jump_lsb, error, "Jump table page crossed!"
 vdelay_low_jump_msb:
 	.byte >(vdelay_low0-1)
 	.byte >(vdelay_low1-1)
@@ -57,7 +57,7 @@ vdelay_low_jump_msb:
 	.byte >(vdelay_low5-1)
 	.byte >(vdelay_low6-1)
 	.byte >(vdelay_low7-1)
-	.assert >* = >vdelay_low_jump_msb, error, "Jump table page crossed!"
+	.assert >(*-1) = >vdelay_low_jump_msb, error, "Jump table page crossed!"
 
 vdelay: ;                                +6 = 6 (jsr)
 	cpx #0                             ; +2 = 8
