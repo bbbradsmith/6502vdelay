@@ -69,14 +69,14 @@ The "extreme" version uses a large intro table and nopslide to achieve a 40 cycl
 ## History
 
 * Version 1
-** vdelay - 78 cycles, 176 bytes.
+  * vdelay - 78 cycles, 176 bytes.
 * Version 2
-** vdelay - 64, 174.
+  * vdelay - 64, 174.
 * Version 3
-** vdelay - reduced alignment requirement.
-** vdelay_short - 57-255, 135.
-** vdelay_compact - 72, 144.
-** vdelay_extreme - 40, 896.
+  * vdelay - reduced alignment requirement.
+  * vdelay_short - 57-255, 135.
+  * vdelay_compact - 72, 144.
+  * vdelay_extreme - 40, 896.
 
 ## License
 
