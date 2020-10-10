@@ -57,6 +57,8 @@ This routine is built around a loop that takes 8 cycles to subtract 8 from a num
  we have subtract the cycle overhead that it takes to prepare to enter the table/loop.
  This overhead is what causes the routine to have a minimum.
 
+This code should be 65C02 compatible, as it does not use instructions that have different timings from 6502.
+
 The 128-byte alignment requirement was chosen for ease of maintenance/use.
  If you remove the **.align** directive, it will still ensure correct branch timing with asserts,
  so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
