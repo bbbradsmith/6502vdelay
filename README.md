@@ -11,7 +11,7 @@ Version 3
 
 ## Usage
 
-* **vdelay.s** - source code (64-65535 cycles, 174 bytes)
+* **vdelay.s** - normal version (64-65535 cycles, 174 bytes)
 * **vdelay_short.s** - short version (57-255 cycles, 135 bytes)
 * **vdelay_compact.s** - compact version (72-65535 cycles, 144 bytes)
 * **vdelay_extreme.s** - extreme version (40-65535 cycles, 896 bytes)
@@ -22,6 +22,8 @@ Assemble and include the source code in your project. It exports the **vdelay**
 
 The minimum amount of delay is currently **64 cycles**.
  If the given parameter is less than that it will still delay that minimum number of cycles.
+ The cycle count includes the jsr/rts of the subroutine call,
+ though you will probably need to account for a few extra cycles to load A/X before calling.
 
 This code must be placed in a 128-byte-aligned segment. Add **align=128** to your **CODE** segment CFG
  or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
