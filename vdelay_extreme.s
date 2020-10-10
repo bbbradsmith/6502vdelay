@@ -1,14 +1,14 @@
-; vdelay
+; vdelay (extreme version)
 ; Brad Smith, 2020
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
-; delays for X:A cycles, minimum: 64 (includes jsr)
+; delays for X:A cycles, minimum: 40 (includes jsr)
 ;   A = low bits of cycles to delay
 ;   X = high bits of cycles to delay
 ;   A/X/Y clobbered
 
-VDELAY_MINIMUM = 64
+VDELAY_MINIMUM = 40
 VDELAY_FULL_OVERHEAD = 77
 
 ; assert to make sure branches do not page-cross
@@ -22,9 +22,21 @@ VDELAY_FULL_OVERHEAD = 77
 	jmp *+3
 .endmacro
 
-.align 128
+.align 256
 
-; jump table
+; jump table for vdelay_intro
+vdelay_intro_lsb:
+	.repeat 256, I
+		.byte <(.ident(.sprintf("vdelay_intro%d",I))-1)
+	.endrepeat
+	.assert >(*-1) = >vdelay_intro_lsb, error, "Jump table page crossed!"
+vdelay_intro_msb:
+	.repeat 256, I
+		.byte >(.ident(.sprintf("vdelay_intro%d",I))-1)
+	.endrepeat
+	.assert >(*-1) = >vdelay_intro_msb, error, "Jump table page crossed!"
+
+; jump table for vdelay_full
 vdelay_low_jump_lsb:
 	.byte <(vdelay_low0-1)
 	.byte <(vdelay_low1-1)
@@ -34,7 +46,7 @@ vdelay_low_jump_lsb:
 	.byte <(vdelay_low5-1)
 	.byte <(vdelay_low6-1)
 	.byte <(vdelay_low7-1)
-.assert >(*-1) = >vdelay_low_jump_lsb, error, "Jump table page crossed!"
+	.assert >* = >vdelay_low_jump_lsb, error, "Jump table page crossed!"
 vdelay_low_jump_msb:
 	.byte >(vdelay_low0-1)
 	.byte >(vdelay_low1-1)
@@ -44,14 +56,18 @@ vdelay_low_jump_msb:
 	.byte >(vdelay_low5-1)
 	.byte >(vdelay_low6-1)
 	.byte >(vdelay_low7-1)
-.assert >(*-1) = >vdelay_low_jump_msb, error, "Jump table page crossed!"
+	.assert >* = >vdelay_low_jump_msb, error, "Jump table page crossed!"
 
 vdelay: ;                                +6 = 6 (jsr)
 	cpx #0                             ; +2 = 8
 	bne vdelay_full                    ; +2 = 10
-	sec                                ; +2 = 12
-	sbc #VDELAY_MINIMUM                ; +2 = 14
-	BRPAGE bcc, vdelay_toolow          ; +2 = 16
+	tay                                ; +2 = 12
+	lda vdelay_intro_msb, Y            ; +4 = 16
+	pha                                ; +3 = 19
+	lda vdelay_intro_lsb, Y            ; +4 = 23
+	pha                                ; +3 = 26
+	rts                                ; +6 = 32
+	;                                  ; +8 = 40 (nopslide + rts overhead)
 
 vdelay_low:                            ;           29 (full path)
 	pha                                ; +3 = 19 / 32 (low only / full path)
@@ -75,13 +91,6 @@ vdelay_low_rest:                       ;+10 = 55 / 68 (returning from jump table
 	nop                                ; +2 = 58 / 71
 vdelay_low_none:                       ; +3 = 58 / 71 (from branch)
 	rts                                ; +6 = 64 / 77
-
-vdelay_toolow:                         ; +3 = 17 (
-	jsr vdelay_24                      ;+24 = 41
-	jsr vdelay_12                      ;+12 = 53
-	NOP3                               ; +3 = 56
-	nop                                ; +2 = 58
-	rts                                ; +6 = 64
 
 vdelay_full:                           ; +3 = 11
 	sec                                ; +2 = 13
@@ -161,6 +170,16 @@ vdelay_low7:
 	NOP3
 	jmp vdelay_low_rest
 
-; a few compact delays
-vdelay_24: jsr vdelay_12
-vdelay_12: rts
+; intro nopslides
+.repeat 108, I ; evens
+.ident(.sprintf("vdelay_intro%d",254-(I*2))): nop
+.endrepeat
+	rts
+.repeat 107, I ; odds
+.ident(.sprintf("vdelay_intro%d",255-(I*2))): nop
+.endrepeat
+vdelay_intro41: NOP3
+	rts
+.repeat 40, I ; below minimum
+.ident(.sprintf("vdelay_intro%d",I)) = vdelay_intro40
+.endrepeat

@@ -20,6 +20,9 @@ REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_short.s
 REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_compact.s
 @IF ERRORLEVEL 1 GOTO error
 
+REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_extreme.s
+@IF ERRORLEVEL 1 GOTO error
+
 cc65\bin\ca65 -o temp\test.o -g test.s
 @IF ERRORLEVEL 1 GOTO error
 

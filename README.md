@@ -14,6 +14,7 @@ Version 3
 * **vdelay.s** - source code (64-65535 cycles, 174 bytes)
 * **vdelay_short.s** - short version (57-255 cycles, 135 bytes)
 * **vdelay_compact.s** - compact version (72-65535 cycles, 144 bytes)
+* **vdelay_extreme.s** - extreme version (40-65535 cycles, 896 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
@@ -29,6 +30,8 @@ The "short" version only permits 57-255 cycle delays, and only takes **A** as it
  parameter.
 
 The "compact" version has a higher minimum of 72 cycles, but is slightly smaller at 144 bytes.
+
+The "extreme" version has a lower minimum of 40 cycles, but is much larger, requiring 896 bytes, and 256-byte alignment.
 
 ## Tests
 
@@ -57,16 +60,23 @@ The 128-byte alignment requirement was chosen for ease of maintenance/use.
  so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
  you might be able to get away with much smaller alignment.
 
+The "extreme" version uses a large intro table and nopslide to achieve a 40 cycle minimum,
+ at the expense of much greater code size. With some sacrifices (e.g. 255 maximum,
+ or zero-page memory use for indirect jmp or avoiding pla) it could get a few cycles lower,
+ but I'll leave that adaptation for others. I can't cover every possibly permuation here,
+ but I hope these examples might give an idea for those that need to go further.
+
 ## History
 
 * Version 1
 ** vdelay - 78 cycles, 176 bytes.
 * Version 2
-** vdelay - 64 cycles, 174 bytes.
+** vdelay - 64, 174.
 * Version 3
 ** vdelay - reduced alignment requirement.
 ** vdelay_short - 57-255, 135.
 ** vdelay_compact - 72, 144.
+** vdelay_extreme - 40, 896.
 
 ## License
 

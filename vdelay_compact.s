@@ -28,12 +28,12 @@ vdelay_jump_lsb:
 	.repeat 16, I
 		.byte <(.ident(.sprintf("vdelay%d",I))-1)
 	.endrepeat
-	.assert >* = >vdelay_jump_lsb, error, "Jump table page crossed!"
+	.assert >(*-1) = >vdelay_jump_lsb, error, "Jump table page crossed!"
 vdelay_jump_msb:
 	.repeat 16, I
 		.byte >(.ident(.sprintf("vdelay%d",I))-1)
 	.endrepeat
-	.assert >* = >vdelay_jump_msb, error, "Jump table page crossed!"
+	.assert >(*-1) = >vdelay_jump_msb, error, "Jump table page crossed!"
 
 vdelay:                                ; +6 = 6 (jsr)
 	sec                                ; +2 = 8
