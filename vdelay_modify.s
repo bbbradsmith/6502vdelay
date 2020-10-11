@@ -86,8 +86,9 @@ vdelay_clockslide:
 vdelay_low_none:                       ; +3 = 40 / 55 (from branch)
 	rts                                ; +6 = 46 / 61
 
-vdelay_toolow:                         ; +3 = 15 (from branch)
+vdelay_toolow:
 .if DIVIDED = 0
+	;                                    +3 = 15 (from branch)
 	ldy #4                             ; +2 = 17
 	: ; 5 cycle loop                    +20 = 37
 		dey
