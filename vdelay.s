@@ -42,8 +42,8 @@ vdelay_low_jump_msb:
 .assert >(*-1) = >vdelay_low_jump_msb, error, "Jump table page crossed!"
 
 vdelay: ;                                +6 = 6 (jsr)
-	cpx #0                             ; +2 = 8
-	BRPAGE bne, vdelay_full            ; +2 = 10 (sets carry)
+	cpx #0                             ; +2 = 8 (sets carry)
+	BRPAGE bne, vdelay_full            ; +2 = 10
 	sbc #VDELAY_MINIMUM                ; +2 = 12
 	BRPAGE bcc, vdelay_toolow          ; +2 = 14
 

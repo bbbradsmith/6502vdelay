@@ -31,8 +31,8 @@ VDELAY_FULL_OVERHEAD = 61 + (DIVIDED * 3)
 .endif
 
 vdelay: ;                                +6 = 6 (jsr)
-	cpx #0                             ; +2 = 8
-	BRPAGE bne, vdelay_full_jmp        ; +2 = 10 (sets carry)
+	cpx #0                             ; +2 = 8 (sets carry)
+	BRPAGE bne, vdelay_full_jmp        ; +2 = 10
 	sbc #VDELAY_MINIMUM                ; +2 = 12
 	BRPAGE bcc, vdelay_toolow_jmp      ; +2 = 14
 
