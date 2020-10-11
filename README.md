@@ -7,13 +7,15 @@ You might call this arbitrary delay, procedural delay, programmatic delay, varia
 
 Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
-Version 5
+Version 6
 
 ## Usage
 
-* **vdelay.s** - normal version (63-65535 cycles, 98 bytes)
-* **vdelay_short.s** - short version (56-255 cycles, 71 bytes)
-* **vdelay_extreme.s** - extreme version (40-65535 cycles, 827 bytes)
+* **vdelay.s** - normal version (63-65535 cycles, 97 bytes)
+* **vdelay_short.s** - short version (56-255 cycles, 70 bytes)
+* **vdelay_clockslide.s** - clockslide version (62-65535 cycles, 91 bytes)
+* **vdelay_modify.s** - self modifying version (48-65535 cycles, 75 RAM or 28+52 RAM+ROM)
+* **vdelay_extreme.s** - extreme version (40-65535 cycles, 826 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
@@ -29,6 +31,17 @@ This code must be placed in a 128-byte-aligned segment. Add **align=128** to you
 
 The "short" version only permits delays only up to 255, with A as its parameter.
  Its minimum is lower, and the code is smaller.
+
+The "clockslide" version uses a technique
+ [suggested by Fiskbit](https://forums.nesdev.com/viewtopic.php?p=257562#p257562)
+ which splits 2-byte instructions in half, and has an additional read at $EA
+ (which is likely inconsequential). This reduces minimum and code size slightly.
+
+The "self modifying" version places all or part of the code in RAM to lower the minimum.
+ This is suitable for platforms where most code is run from RAM (Apple II, C64).
+ For other platforms a "divided" option is provided that takes fewer bytes of RAM
+ and places the rest in a separate ROM segment, though the RAM will have to be
+ copied to where it is needed. (Also incorporates the clockslide technique.)
 
 The "extreme" version has a lower minimum cycles, but is much larger, and requires 256-byte alignment.
 
@@ -56,16 +69,15 @@ This routine is built around a loop that takes 8 cycles to subtract 8 from a num
 
 This code should be 65C02 compatible, as it does not use instructions that have different timings from 6502.
 
-The 128-byte alignment requirement was chosen for ease of maintenance/use.
+The byte alignment requirements were chosen for ease of maintenance/use.
  If you remove the **.align** directive, it will still ensure correct branch timing with asserts,
  so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
  you might be able to get away with much smaller alignment.
 
 The "extreme" version uses a large intro table and nopslide to achieve a 40 cycle minimum,
  at the expense of much greater code size. With some sacrifices (e.g. 255 maximum,
- or zero-page memory use for indirect jmp or avoiding pla) it could get a few cycles lower,
- but I'll leave that adaptation for others. I can't cover every possibly permuation here,
- but I hope these examples might give an idea for those that need to go further.
+ or zero-page memory use for indirect jmp or avoiding pla, or a self-modifying jmp)
+ it could get a few cycles lower, but I'll leave that adaptation for others.
 
 If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time)
  you may find Bisqwit's *fixed-cycle delay code vending machine* useful:
@@ -92,6 +104,12 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay - 63, 98.
   * vdelay_short - 56, 71.
   * vdelay_extreme - 40, 827.
+* Version 6
+  * vdelay - 63, 97.
+  * vdelay_short - 56, 70.
+  * vdelay_clockslide - 62, 91.
+  * vdelay_modify - 48, 75/28+52.
+  * vdelay_extreme - 40, 826.
 
 ## License
 

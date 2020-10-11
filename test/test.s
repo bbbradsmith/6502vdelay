@@ -60,3 +60,6 @@ _test: ; decode arguments in a consistent cycle count, run vdelay
 	ldx tmp2
 	; X:A = argument
 	jmp vdelay
+
+.segment "RAMCODE"
+; empty placeholder

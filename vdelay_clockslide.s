@@ -1,15 +1,18 @@
-; vdelay
+; vdelay (clockslide version)
 ; Brad Smith, 2020
 ; https://github.com/bbbradsmith/6502vdelay
+;
+; "clockslide" technique suggested by Fiskbit
 
 .export vdelay
-; delays for X:A cycles, minimum: 63 (includes jsr)
+; delays for X:A cycles, minimum: 62 (includes jsr)
 ;   A = low bits of cycles to delay
 ;   X = high bits of cycles to delay
 ;   A/X/Y clobbered
+;   performs a read to $EA
 
-VDELAY_MINIMUM = 63
-VDELAY_FULL_OVERHEAD = 76
+VDELAY_MINIMUM = 62
+VDELAY_FULL_OVERHEAD = 75
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -58,26 +61,38 @@ vdelay_low:                            ;           29 (full path)
 	pha                                ; +3 = 37 / 50
 	rts                                ; +6 = 43 / 56
 
-vdelay_low_rest:                       ; +5 = 48 / 61 (returning from jump table)
-	pla                                ; +4 = 52 / 65
-	and #$F8                           ; +2 = 54 / 67
-	BRPAGE beq, vdelay_low_none        ; +2 = 56 / 69
+; "clockslide" technique
+; each line splits a CMP intruction in half to add 1 cycle per line
+; delays 2 + 0-7 cycles
+vdelay_low7: .byte $C9 ; CMP #$C9 (+2)
+vdelay_low6: .byte $C9 ; CMP #$C9
+vdelay_low5: .byte $C9 ; CMP #$C9
+vdelay_low4: .byte $C9 ; CMP #$C9
+vdelay_low3: .byte $C9 ; CMP #$C9
+vdelay_low2: .byte $C9 ; CMP #$C9
+vdelay_low1: .byte $C5 ; CMP $EA (+3, reads zero-page)
+vdelay_low0: .byte $EA ; NOP (+2)
+
+vdelay_low_rest:                       ; +2 = 45 / 58 (returning from jump table)
+	pla                                ; +4 = 49 / 62
+	and #$F8                           ; +2 = 51 / 64
+	sec                                ; +2 = 53 / 66
+	BRPAGE beq, vdelay_low_none        ; +2 = 55 / 68
 	: ; 8 cycles each iteration
 		sbc #8          ; +2 = 2
 		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
-		BRPAGE bne, :-  ; +3 = 8         -1 = 55 / 68 (on last iteration)
-	nop                                ; +2 = 57 / 70
-vdelay_low_none:                       ; +3 = 57 / 70 (from branch)
-	rts                                ; +6 = 63 / 76
+		BRPAGE bne, :-  ; +3 = 8         -1 = 54 / 67 (on last iteration)
+	nop                                ; +2 = 56 / 69
+vdelay_low_none:                       ; +3 = 56 / 69 (from branch)
+	rts                                ; +6 = 62 / 75
 
 vdelay_toolow:                         ; +3 = 17 (from branch)
 	ldy #7                             ; +2 = 19
 	: ; 5 cycle loop                    +35 = 54
 		dey
 		BRPAGE bne, :-                 ; -1 = 53 (on last iteration)
-	nop                                ; +2 = 55
-	nop                                ; +2 = 57
-	rts                                ; +6 = 63
+	BRPAGE beq, *+2                    ; +3 = 56 (branch always)
+	rts                                ; +6 = 62
 
 vdelay_full:                           ; +3 = 11
 	sec                                ; +2 = 13
@@ -95,17 +110,6 @@ vdelay_full:                           ; +3 = 11
 		BRPAGE bne, :--    ; +3 = 256    -1 = 22 (on last iteration)
 	nop                                ; +2 = 24
 vdelay_high_none:                      ; +3 = 24 (from branch)
+	.assert (*-vdelay_low_jump_lsb)<128, error, "Last branch does not fit alignment?"
 	tya                                ; +2 = 26
 	jmp vdelay_low                     ; +3 = 29
-
-; each of these is 5 cycles + 0-7 cycles
-vdelay_low6: nop
-vdelay_low4: nop
-vdelay_low2: nop
-vdelay_low0: nop
-	jmp vdelay_low_rest
-vdelay_low7: nop
-vdelay_low5: nop
-vdelay_low3: nop
-vdelay_low1: BRPAGE bcs, *+2 ; (+3) branch always
-	jmp vdelay_low_rest

@@ -20,6 +20,12 @@ REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_short.s
 REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_extreme.s
 @IF ERRORLEVEL 1 GOTO error
 
+REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_clockslide.s
+@IF ERRORLEVEL 1 GOTO error
+
+REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_modify.s
+@IF ERRORLEVEL 1 GOTO error
+
 cc65\bin\ca65 -o temp\test.o -g test.s
 @IF ERRORLEVEL 1 GOTO error
 
@@ -33,6 +39,9 @@ cc65\bin\ca65 -o temp\test.c.o -g temp\test.c.s
 @IF ERRORLEVEL 1 GOTO error
 
 cc65\bin\ld65 -o temp\test.bin -C test.cfg -m temp\test.map temp\vdelay.o temp\test.o temp\test.c.o sim6502.lib
+@IF ERRORLEVEL 1 GOTO error
+
+REM cc65\bin\ld65 -o temp\test.bin -C test.cfg -m temp\test.map temp\vdelay.o temp\test.o temp\test.c.o sim65C02.lib
 @IF ERRORLEVEL 1 GOTO error
 
 cc65\bin\ld65 -o temp\test_nes.nes -C test_nes.cfg --dbgfile temp\test_nes.dbg -m temp\test_nes.map temp\vdelay.o temp\test_nes.o

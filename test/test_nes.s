@@ -26,6 +26,8 @@ pad: .res 1
 pad_last: .res 1
 pad_new: .res 1
 temp: .res 1
+ptr0: .res 2
+ptr1: .res 2
 
 .segment "CODE"
 
@@ -75,6 +77,40 @@ gamepad_poll:
 	sta pad
 	rts
 
+.import __RAMCODE_LOAD__
+.import __RAMCODE_SIZE__
+.import __RAMCODE_RUN__
+__RAMCODE_END__ = __RAMCODE_LOAD__ + __RAMCODE_SIZE__
+copyramcode:
+	lda #<__RAMCODE_LOAD__
+	sta ptr0+0
+	lda #>__RAMCODE_LOAD__
+	sta ptr0+1
+	lda #<__RAMCODE_RUN__
+	sta ptr1+0
+	lda #>__RAMCODE_RUN__
+	sta ptr1+1
+	ldy #0
+copyramcode_loop:
+	lda ptr0+0
+	cmp #<__RAMCODE_END__
+	lda ptr0+1
+	sbc #>__RAMCODE_END__
+	bcs copyramcode_end
+	lda (ptr0), Y
+	sta (ptr1), Y
+	inc ptr0+0
+	bne :+
+	inc ptr0+1
+	:
+	inc ptr1+0
+	bne :+
+	inc ptr1+1
+	:
+	jmp copyramcode_loop
+copyramcode_end:
+	rts
+
 reset:
 	sei
 	lda #0
@@ -109,6 +145,8 @@ reset:
 		sta $2007
 		dex
 		bne :-
+	; setup ramcode
+	jsr copyramcode
 	; setup variables
 	lda #0
 	sta param+0
@@ -231,6 +269,9 @@ wait: ; wait for pad press
 		bit DEBUG_END
 	:
 	jmp loop
+
+.segment "RAMCODE"
+; empty placeholder
 
 .segment "HEADER"
 INES_MAPPER = 0 ; 0 = NROM
