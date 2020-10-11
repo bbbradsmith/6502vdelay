@@ -5,7 +5,7 @@
 ; "clockslide" technique suggested by Fiskbit
 
 .export vdelay
-; delays for X:A cycles, minimum: 62 (includes jsr)
+; delays for X:A cycles, minimum: 60 (includes jsr)
 ;   A = low bits of cycles to delay
 ;   X = high bits of cycles to delay
 ;   A/X/Y clobbered
