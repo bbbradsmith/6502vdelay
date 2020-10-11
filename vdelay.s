@@ -8,7 +8,7 @@
 ;   X = high bits of cycles to delay
 ;   A/X/Y clobbered
 
-VDELAY_MINIMUM = 63
+VDELAY_MINIMUM = 61
 VDELAY_FULL_OVERHEAD = 76
 
 ; assert to make sure branches do not page-cross
@@ -43,41 +43,40 @@ vdelay_low_jump_msb:
 
 vdelay: ;                                +6 = 6 (jsr)
 	cpx #0                             ; +2 = 8
-	BRPAGE bne, vdelay_full            ; +2 = 10
-	sec                                ; +2 = 12
-	sbc #VDELAY_MINIMUM                ; +2 = 14
-	BRPAGE bcc, vdelay_toolow          ; +2 = 16
+	BRPAGE bne, vdelay_full            ; +2 = 10 (sets carry)
+	sbc #VDELAY_MINIMUM                ; +2 = 12
+	BRPAGE bcc, vdelay_toolow          ; +2 = 14
 
 vdelay_low:                            ;           29 (full path)
-	pha                                ; +3 = 19 / 32 (low only / full path)
-	and #7                             ; +2 = 21 / 34
-	tay                                ; +2 = 23 / 36
-	lda vdelay_low_jump_msb, Y         ; +4 = 27 / 40
-	pha                                ; +3 = 30 / 43
-	lda vdelay_low_jump_lsb, Y         ; +4 = 34 / 47
-	pha                                ; +3 = 37 / 50
-	rts                                ; +6 = 43 / 56
+	pha                                ; +3 = 17 / 32 (low only / full path)
+	and #7                             ; +2 = 19 / 34
+	tay                                ; +2 = 21 / 36
+	lda vdelay_low_jump_msb, Y         ; +4 = 25 / 40
+	pha                                ; +3 = 28 / 43
+	lda vdelay_low_jump_lsb, Y         ; +4 = 32 / 47
+	pha                                ; +3 = 35 / 50
+	rts                                ; +6 = 41 / 56
 
-vdelay_low_rest:                       ; +5 = 48 / 61 (returning from jump table)
-	pla                                ; +4 = 52 / 65
-	and #$F8                           ; +2 = 54 / 67
-	BRPAGE beq, vdelay_low_none        ; +2 = 56 / 69
+vdelay_low_rest:                       ; +5 = 46 / 61 (returning from jump table)
+	pla                                ; +4 = 50 / 65
+	and #$F8                           ; +2 = 52 / 67
+	BRPAGE beq, vdelay_low_none        ; +2 = 54 / 69
 	: ; 8 cycles each iteration
 		sbc #8          ; +2 = 2
 		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
-		BRPAGE bne, :-  ; +3 = 8         -1 = 55 / 68 (on last iteration)
-	nop                                ; +2 = 57 / 70
-vdelay_low_none:                       ; +3 = 57 / 70 (from branch)
-	rts                                ; +6 = 63 / 76
+		BRPAGE bne, :-  ; +3 = 8         -1 = 53 / 68 (on last iteration)
+	nop                                ; +2 = 55 / 70
+vdelay_low_none:                       ; +3 = 55 / 70 (from branch)
+	rts                                ; +6 = 61 / 76
 
-vdelay_toolow:                         ; +3 = 17 (from branch)
-	ldy #7                             ; +2 = 19
-	: ; 5 cycle loop                    +35 = 54
+vdelay_toolow:                         ; +3 = 15 (from branch)
+	ldy #7                             ; +2 = 17
+	: ; 5 cycle loop                    +35 = 52
 		dey
-		BRPAGE bne, :-                 ; -1 = 53 (on last iteration)
+		BRPAGE bne, :-                 ; -1 = 51 (on last iteration)
+	nop                                ; +2 = 53
 	nop                                ; +2 = 55
-	nop                                ; +2 = 57
-	rts                                ; +6 = 63
+	rts                                ; +6 = 61
 
 vdelay_full:                           ; +3 = 11
 	sec                                ; +2 = 13

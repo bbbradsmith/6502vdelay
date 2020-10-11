@@ -13,7 +13,7 @@
 ; 1 = code divided into RAMCODE (RAM) and CODE (ROM) sections
 DIVIDED = 0
 
-VDELAY_MINIMUM = 48
+VDELAY_MINIMUM = 46
 VDELAY_FULL_OVERHEAD = 61 + (DIVIDED * 3)
 
 ; assert to make sure branches do not page-cross
@@ -32,19 +32,18 @@ VDELAY_FULL_OVERHEAD = 61 + (DIVIDED * 3)
 
 vdelay: ;                                +6 = 6 (jsr)
 	cpx #0                             ; +2 = 8
-	BRPAGE bne, vdelay_full_jmp        ; +2 = 10
-	sec                                ; +2 = 12
-	sbc #VDELAY_MINIMUM                ; +2 = 14
-	BRPAGE bcc, vdelay_toolow_jmp      ; +2 = 16
+	BRPAGE bne, vdelay_full_jmp        ; +2 = 10 (sets carry)
+	sbc #VDELAY_MINIMUM                ; +2 = 12
+	BRPAGE bcc, vdelay_toolow_jmp      ; +2 = 14
 
 vdelay_low:                            ;           29 (full path)
-	tay                                ; +2 = 18 / 31
-	and #7                             ; +2 = 20 / 33
-	eor #$FF                           ; +2 = 22 / 35
-	adc #<(vdelay_clockslide+7)        ; +2 = 24 / 37
-	sta vdelay_dispatch+1              ; +4 = 28 / 41
+	tay                                ; +2 = 16 / 31
+	and #7                             ; +2 = 18 / 33
+	eor #$FF                           ; +2 = 20 / 35
+	adc #<(vdelay_clockslide+7)        ; +2 = 22 / 37
+	sta vdelay_dispatch+1              ; +4 = 26 / 41 (modifies JMP)
 vdelay_dispatch:
-	jmp vdelay_clockslide              ; +3 = 31 / 44
+	jmp vdelay_clockslide              ; +3 = 29 / 44
 
 .if DIVIDED = 0
 
@@ -74,36 +73,36 @@ vdelay_clockslide:
 	.byte $EA ; NOP (+2)
 	.assert >(*-1) = >(vdelay_clockslide), error, "Clockslide page crossing!"
 
-	;                                    +2 = 33 / 46 ( from clockslide)
-	sec                                ; +2 = 35 / 48
-	tya                                ; +2 = 37 / 50
-	and #$F8                           ; +2 = 39 / 52
-	BRPAGE beq, vdelay_low_none        ; +2 = 41 / 54
+	;                                    +2 = 31 / 46 ( from clockslide)
+	sec                                ; +2 = 33 / 48
+	tya                                ; +2 = 35 / 50
+	and #$F8                           ; +2 = 37 / 52
+	BRPAGE beq, vdelay_low_none        ; +2 = 39 / 54
 	: ; 8 cycles each iteration
 		sbc #8          ; +2 = 2
 		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
-		BRPAGE bne, :-  ; +3 = 8         -1 = 40 / 53 (on last iteration)
-	nop                                ; +2 = 42 / 55
-vdelay_low_none:                       ; +3 = 42 / 55 (from branch)
-	rts                                ; +6 = 48 / 61
+		BRPAGE bne, :-  ; +3 = 8         -1 = 38 / 53 (on last iteration)
+	nop                                ; +2 = 40 / 55
+vdelay_low_none:                       ; +3 = 40 / 55 (from branch)
+	rts                                ; +6 = 46 / 61
 
-vdelay_toolow:                         ; +3 = 17 (from branch)
+vdelay_toolow:                         ; +3 = 15 (from branch)
 .if DIVIDED = 0
-	ldy #4                             ; +2 = 19
-	: ; 5 cycle loop                    +20 = 39
+	ldy #4                             ; +2 = 17
+	: ; 5 cycle loop                    +20 = 37
 		dey
-		BRPAGE bne, :-                 ; -1 = 38 (on last iteration)
+		BRPAGE bne, :-                 ; -1 = 36 (on last iteration)
+	nop                                ; +2 = 38
 	nop                                ; +2 = 40
-	nop                                ; +2 = 42
-	rts                                ; +6 = 48
+	rts                                ; +6 = 46
 .else
-	;                                    +3 = 20 (from branch)
-	ldy #3                             ; +2 = 22
-	: ; 7 cycle loop                    +21 = 43
+	;                                    +3 = 18 (from branch)
+	ldy #3                             ; +2 = 20
+	: ; 7 cycle loop                    +21 = 41
 		dey
 		nop
-		BRPAGE bne, :-                 ; -1 = 42 (on last iteration)
-	rts                                ; +6 = 48
+		BRPAGE bne, :-                 ; -1 = 40 (on last iteration)
+	rts                                ; +6 = 46
 .endif
 
 vdelay_full:                           ; +3 = 11

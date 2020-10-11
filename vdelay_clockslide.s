@@ -11,7 +11,7 @@
 ;   A/X/Y clobbered
 ;   performs a read to $EA
 
-VDELAY_MINIMUM = 62
+VDELAY_MINIMUM = 60
 VDELAY_FULL_OVERHEAD = 75
 
 ; assert to make sure branches do not page-cross
@@ -45,21 +45,20 @@ vdelay_low_jump_msb:
 .assert >(*-1) = >vdelay_low_jump_msb, error, "Jump table page crossed!"
 
 vdelay: ;                                +6 = 6 (jsr)
-	cpx #0                             ; +2 = 8
+	cpx #0                             ; +2 = 8 (sets carry)
 	BRPAGE bne, vdelay_full            ; +2 = 10
-	sec                                ; +2 = 12
-	sbc #VDELAY_MINIMUM                ; +2 = 14
-	BRPAGE bcc, vdelay_toolow          ; +2 = 16
+	sbc #VDELAY_MINIMUM                ; +2 = 12
+	BRPAGE bcc, vdelay_toolow          ; +2 = 14
 
 vdelay_low:                            ;           29 (full path)
-	pha                                ; +3 = 19 / 32 (low only / full path)
-	and #7                             ; +2 = 21 / 34
-	tay                                ; +2 = 23 / 36
-	lda vdelay_low_jump_msb, Y         ; +4 = 27 / 40
-	pha                                ; +3 = 30 / 43
-	lda vdelay_low_jump_lsb, Y         ; +4 = 34 / 47
-	pha                                ; +3 = 37 / 50
-	rts                                ; +6 = 43 / 56
+	pha                                ; +3 = 17 / 32 (low only / full path)
+	and #7                             ; +2 = 19 / 34
+	tay                                ; +2 = 21 / 36
+	lda vdelay_low_jump_msb, Y         ; +4 = 25 / 40
+	pha                                ; +3 = 28 / 43
+	lda vdelay_low_jump_lsb, Y         ; +4 = 32 / 47
+	pha                                ; +3 = 35 / 50
+	rts                                ; +6 = 41 / 56
 
 ; "clockslide" technique
 ; each line splits a CMP intruction in half to add 1 cycle per line
@@ -73,26 +72,26 @@ vdelay_low2: .byte $C9 ; CMP #$C9
 vdelay_low1: .byte $C5 ; CMP $EA (+3, reads zero-page)
 vdelay_low0: .byte $EA ; NOP (+2)
 
-vdelay_low_rest:                       ; +2 = 45 / 58 (returning from jump table)
-	pla                                ; +4 = 49 / 62
-	and #$F8                           ; +2 = 51 / 64
-	sec                                ; +2 = 53 / 66
-	BRPAGE beq, vdelay_low_none        ; +2 = 55 / 68
+vdelay_low_rest:                       ; +2 = 43 / 58 (returning from jump table)
+	pla                                ; +4 = 47 / 62
+	and #$F8                           ; +2 = 49 / 64
+	sec                                ; +2 = 51 / 66
+	BRPAGE beq, vdelay_low_none        ; +2 = 53 / 68
 	: ; 8 cycles each iteration
 		sbc #8          ; +2 = 2
 		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
-		BRPAGE bne, :-  ; +3 = 8         -1 = 54 / 67 (on last iteration)
-	nop                                ; +2 = 56 / 69
-vdelay_low_none:                       ; +3 = 56 / 69 (from branch)
-	rts                                ; +6 = 62 / 75
+		BRPAGE bne, :-  ; +3 = 8         -1 = 52 / 67 (on last iteration)
+	nop                                ; +2 = 54 / 69
+vdelay_low_none:                       ; +3 = 54 / 69 (from branch)
+	rts                                ; +6 = 60 / 75
 
-vdelay_toolow:                         ; +3 = 17 (from branch)
-	ldy #7                             ; +2 = 19
-	: ; 5 cycle loop                    +35 = 54
+vdelay_toolow:                         ; +3 = 15 (from branch)
+	ldy #7                             ; +2 = 17
+	: ; 5 cycle loop                    +35 = 52
 		dey
-		BRPAGE bne, :-                 ; -1 = 53 (on last iteration)
-	BRPAGE beq, *+2                    ; +3 = 56 (branch always)
-	rts                                ; +6 = 62
+		BRPAGE bne, :-                 ; -1 = 51 (on last iteration)
+	BRPAGE beq, *+2                    ; +3 = 54 (branch always)
+	rts                                ; +6 = 60
 
 vdelay_full:                           ; +3 = 11
 	sec                                ; +2 = 13

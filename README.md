@@ -11,10 +11,10 @@ Version 6
 
 ## Usage
 
-* **vdelay.s** - normal version (63-65535 cycles, 97 bytes)
+* **vdelay.s** - normal version (61-65535 cycles, 96 bytes)
 * **vdelay_short.s** - short version (56-255 cycles, 70 bytes)
-* **vdelay_clockslide.s** - clockslide version (62-65535 cycles, 91 bytes)
-* **vdelay_modify.s** - self modifying version (48-65535 cycles, 75 RAM or 28+52 RAM+ROM)
+* **vdelay_clockslide.s** - clockslide version (60-65535 cycles, 90 bytes)
+* **vdelay_modify.s** - self modifying version (46-65535 cycles, 75 RAM or 27+52 RAM+ROM)
 * **vdelay_extreme.s** - extreme version (40-65535 cycles, 826 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
@@ -105,10 +105,10 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_short - 56, 71.
   * vdelay_extreme - 40, 827.
 * Version 6
-  * vdelay - 63, 97.
+  * vdelay - 61, 96.
   * vdelay_short - 56, 70.
-  * vdelay_clockslide - 62, 91.
-  * vdelay_modify - 48, 75/28+52.
+  * vdelay_clockslide - 60, 90.
+  * vdelay_modify - 46, 74/27+52.
   * vdelay_extreme - 40, 826.
 
 ## License
