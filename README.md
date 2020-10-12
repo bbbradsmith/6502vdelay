@@ -12,10 +12,11 @@ Version 6
 ## Usage
 
 * **vdelay.s** - normal version (61-65535 cycles, 96 bytes)
-* **vdelay_short.s** - short version (56-255 cycles, 70 bytes)
-* **vdelay_clockslide.s** - clockslide version (60-65535 cycles, 90 bytes)
-* **vdelay_modify.s** - self modifying version (46-65535 cycles, 75 RAM or 27+52 RAM+ROM)
+* **vdelay_clockslide.s** - clockslide version (58-65535 cycles, 89 bytes)
+* **vdelay_modify.s** - self modifying version (44-65535 cycles, 72 RAM or 27+52 RAM+ROM)
 * **vdelay_extreme.s** - extreme version (40-65535 cycles, 826 bytes)
+* **vdelay_short.s** - short version (56-255 cycles, 70 bytes)
+* **vdelay_short_clockslide.s** - short clockslide version (51-255 cycles, 48 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
@@ -29,9 +30,6 @@ The minimum amount of delay is currently **63 cycles**.
 This code must be placed in a 128-byte-aligned segment. Add **align=128** to your **CODE** segment CFG
  or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
 
-The "short" version only permits delays only up to 255, with A as its parameter.
- Its minimum is lower, and the code is smaller.
-
 The "clockslide" version uses a technique
  [suggested by Fiskbit](https://forums.nesdev.com/viewtopic.php?p=257562#p257562)
  which splits 2-byte instructions in half, and has an additional read at $EA
@@ -44,6 +42,9 @@ The "self modifying" version places all or part of the code in RAM to lower the 
  copied to where it is needed. (Also incorporates the clockslide technique.)
 
 The "extreme" version has a lower minimum cycles, but is much larger, and requires 256-byte alignment.
+
+The "short" versions only permit delays only up to 255, with A as its parameter.
+ Their minimums are lower, and the code is smaller.
 
 ## Tests
 
@@ -106,10 +107,11 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_extreme - 40, 827.
 * Version 6
   * vdelay - 61, 96.
-  * vdelay_short - 56, 70.
-  * vdelay_clockslide - 60, 90.
-  * vdelay_modify - 46, 74/27+52.
+  * vdelay_clockslide - 60, 89.
+  * vdelay_modify - 44, 72/27+52.
   * vdelay_extreme - 40, 826.
+  * vdelay_short - 56, 70.
+  * vdelay_short_clockslide - 51, 48.
 
 ## License
 

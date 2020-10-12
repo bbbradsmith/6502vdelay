@@ -5,14 +5,14 @@
 ; "clockslide" technique suggested by Fiskbit
 
 .export vdelay
-; delays for X:A cycles, minimum: 60 (includes jsr)
+; delays for X:A cycles, minimum: 58 (includes jsr)
 ;   A = low bits of cycles to delay
 ;   X = high bits of cycles to delay
 ;   A/X/Y clobbered
 ;   performs a read to $EA
 
-VDELAY_MINIMUM = 60
-VDELAY_FULL_OVERHEAD = 75
+VDELAY_MINIMUM = 58
+VDELAY_FULL_OVERHEAD = 73
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -75,23 +75,23 @@ vdelay_low0: .byte $EA ; NOP (+2)
 vdelay_low_rest:                       ; +2 = 43 / 58 (returning from jump table)
 	pla                                ; +4 = 47 / 62
 	and #$F8                           ; +2 = 49 / 64
-	sec                                ; +2 = 51 / 66
-	BRPAGE beq, vdelay_low_none        ; +2 = 53 / 68
+	BRPAGE beq, vdelay_low_none        ; +2 = 51 / 66
+	sec                                ; +2 = 53 / 68
 	: ; 8 cycles each iteration
 		sbc #8          ; +2 = 2
 		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
 		BRPAGE bne, :-  ; +3 = 8         -1 = 52 / 67 (on last iteration)
-	nop                                ; +2 = 54 / 69
-vdelay_low_none:                       ; +3 = 54 / 69 (from branch)
-	rts                                ; +6 = 60 / 75
+vdelay_low_none:                       ; +3 = 52 / 67 (from branch)
+	rts                                ; +6 = 58 / 73
 
 vdelay_toolow:                         ; +3 = 15 (from branch)
-	ldy #7                             ; +2 = 17
-	: ; 5 cycle loop                    +35 = 52
+	ldy #4                             ; +2 = 17
+	: ; 9 cycle loop                    +36 = 53
+		nop
+		nop
 		dey
-		BRPAGE bne, :-                 ; -1 = 51 (on last iteration)
-	BRPAGE beq, *+2                    ; +3 = 54 (branch always)
-	rts                                ; +6 = 60
+		BRPAGE bne, :-                 ; -1 = 52 (on last iteration)
+	rts                                ; +6 = 58
 
 vdelay_full:                           ; +3 = 11
 	sec                                ; +2 = 13

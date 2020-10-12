@@ -13,8 +13,8 @@
 ; 1 = code divided into RAMCODE (RAM) and CODE (ROM) sections
 DIVIDED = 0
 
-VDELAY_MINIMUM = 46
-VDELAY_FULL_OVERHEAD = 61 + (DIVIDED * 3)
+VDELAY_MINIMUM = 44
+VDELAY_FULL_OVERHEAD = 59 + (DIVIDED * 3)
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -74,17 +74,16 @@ vdelay_clockslide:
 	.assert >(*-1) = >(vdelay_clockslide), error, "Clockslide page crossing!"
 
 	;                                    +2 = 31 / 46 ( from clockslide)
-	sec                                ; +2 = 33 / 48
-	tya                                ; +2 = 35 / 50
-	and #$F8                           ; +2 = 37 / 52
-	BRPAGE beq, vdelay_low_none        ; +2 = 39 / 54
+	tya                                ; +2 = 33 / 48
+	and #$F8                           ; +2 = 35 / 50
+	BRPAGE beq, vdelay_low_none        ; +2 = 37 / 52
+	sec                                ; +2 = 39 / 54
 	: ; 8 cycles each iteration
 		sbc #8          ; +2 = 2
 		BRPAGE bcs, *+2 ; +3 = 5 (branch always)
 		BRPAGE bne, :-  ; +3 = 8         -1 = 38 / 53 (on last iteration)
-	nop                                ; +2 = 40 / 55
-vdelay_low_none:                       ; +3 = 40 / 55 (from branch)
-	rts                                ; +6 = 46 / 61
+vdelay_low_none:                       ; +3 = 38 / 53 (from branch)
+	rts                                ; +6 = 44 / 59
 
 vdelay_toolow:
 .if DIVIDED = 0
@@ -94,16 +93,16 @@ vdelay_toolow:
 		dey
 		BRPAGE bne, :-                 ; -1 = 36 (on last iteration)
 	nop                                ; +2 = 38
-	nop                                ; +2 = 40
-	rts                                ; +6 = 46
+	rts                                ; +6 = 44
 .else
-	;                                    +3 = 18 (from branch)
+	;                                    +6 = 18 (from branch)
 	ldy #3                             ; +2 = 20
-	: ; 7 cycle loop                    +21 = 41
+	: ; 5 cycle loop                    +15 = 35
 		dey
-		nop
-		BRPAGE bne, :-                 ; -1 = 40 (on last iteration)
-	rts                                ; +6 = 46
+		BRPAGE bne, :-                 ; -1 = 34 (on last iteration)
+	nop                                ; +2 = 36
+	nop                                ; +2 = 38
+	rts                                ; +6 = 44
 .endif
 
 vdelay_full:                           ; +3 = 11
