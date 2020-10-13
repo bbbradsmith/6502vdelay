@@ -8,7 +8,7 @@
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
-; delays for x:A cycles, minimum: 33 (includes jsr)
+; delays for X:A cycles, minimum: 33 (includes jsr)
 ;   A = low bits of cycles to delay
 ;   X = high bits of cycles to delay
 ;   A/X/Y clobbered

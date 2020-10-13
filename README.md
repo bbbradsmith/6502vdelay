@@ -7,44 +7,39 @@ You might call this arbitrary delay, procedural delay, programmatic delay, varia
 
 Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
-Version 6
+Authors:
+* Brad Smith
+* [Fiskbit](http://forums.nesdev.com/viewtopic.php?p=257651#p257651)
+
+Version 7
 
 ## Usage
 
-* **vdelay.s** - normal version (61-65535 cycles, 96 bytes)
-* **vdelay_clockslide.s** - clockslide version (58-65535 cycles, 89 bytes)
-* **vdelay_modify.s** - self modifying version (44-65535 cycles, 72 RAM or 27+52 RAM+ROM)
-* **vdelay_extreme.s** - extreme version (40-65535 cycles, 826 bytes)
-* **vdelay_short.s** - short version (56-255 cycles, 70 bytes)
-* **vdelay_short_clockslide.s** - short clockslide version (51-255 cycles, 48 bytes)
+* **vdelay.s** - normal version (48-65535 cycles, 62 bytes)
+* **vdelay_modify.s** - self-modifying version (35-65535 cycles, 58 bytes RAM)
+* **vdelay_short.s** - short version (46-255 cycles, 36 bytes)
+* **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
  Low bits in **A**, high bits in **X**.
 
-The minimum amount of delay is currently **63 cycles**.
+The minimum amount of delay is currently **48 cycles**.
  If the given parameter is less than that it will still delay that minimum number of cycles.
  The cycle count includes the jsr/rts of the subroutine call,
  though you will probably need to account for a few extra cycles to load A/X before calling.
 
-This code must be placed in a 128-byte-aligned segment. Add **align=128** to your **CODE** segment CFG
+This code must be placed in a 64-byte-aligned segment. Add **align=64** to your **CODE** segment CFG
  or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
 
-The "clockslide" version uses a technique
- [suggested by Fiskbit](https://forums.nesdev.com/viewtopic.php?p=257562#p257562)
- which splits 2-byte instructions in half, and has an additional read at $EA
- (which is likely inconsequential). This reduces minimum and code size slightly.
-
-The "self modifying" version places all or part of the code in RAM to lower the minimum.
+The **self-modifying** version places the code in RAM to lower the minimum.
  This is suitable for platforms where most code is run from RAM (Apple II, C64).
- For other platforms a "divided" option is provided that takes fewer bytes of RAM
- and places the rest in a separate ROM segment, though the RAM will have to be
- copied to where it is needed. (Also incorporates the clockslide technique.)
+ For other platforms RAM will have to be copied to where it is needed.
+ (The segment "RAMCODE" is used for testing, but any suitable run-from-RAM segment may be substituted.)
 
-The "extreme" version has a lower minimum cycles, but is much larger, and requires 256-byte alignment.
-
-The "short" versions only permit delays only up to 255, with A as its parameter.
- Their minimums are lower, and the code is smaller.
+The **short** versions only permit delays only up to 255, with A as its parameter.
+ Their minimums are lower, and their code is smaller,
+ and there may be less calling overhead because X is ignored.
 
 ## Tests
 
@@ -74,11 +69,6 @@ The byte alignment requirements were chosen for ease of maintenance/use.
  If you remove the **.align** directive, it will still ensure correct branch timing with asserts,
  so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
  you might be able to get away with much smaller alignment.
-
-The "extreme" version uses a large intro table and nopslide to achieve a 40 cycle minimum,
- at the expense of much greater code size. With some sacrifices (e.g. 255 maximum,
- or zero-page memory use for indirect jmp or avoiding pla, or a self-modifying jmp)
- it could get a few cycles lower, but I'll leave that adaptation for others.
 
 If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time)
  you may find Bisqwit's *fixed-cycle delay code vending machine* useful:
@@ -112,6 +102,14 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_extreme - 40, 826.
   * vdelay_short - 56, 70.
   * vdelay_short_clockslide - 51, 48.
+* Version 7
+ * vdelay - 48, 62.
+ * vdelay_clockslide - obsoleted: vdelay is not a clockslide technique.
+ * vdelay_modify - 35, 58.
+ * vdelay_extreme - obsoleted.
+ * vdelay_short - 46, 36.
+ * vdelay_short_clockslide - obsoleted.
+ * vdelay_short_modify - 33, 28.
 
 ## License
 
