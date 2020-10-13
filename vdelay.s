@@ -29,22 +29,22 @@ vdelay:                                ; +6 = 6 (jsr)
 	BRPAGE bne, vdelay_full            ; +2 = 10
 	sbc #VDELAY_MINIMUM                ; +2 = 12
 	BRPAGE bcc, vdelay_toolow          ; +2 = 14
-vdelay_low:                            ;      14 / 29 (low-only / full)
+vdelay_low:
 	: ; 5 cycle countdown + 1 extra loop (carry is set on entry)
-		sbc #5                         ; +2 = 16 / 31 (counting last time only)
-		BRPAGE bcs, :-                 ; +2 = 18 / 33 (counting last time only)
-	tax                                ; +2 = 20 / 35
-	lda #>(vdelay_clockslide-1)        ; +2 = 22 / 37
-	pha                                ; +3 = 25 / 40
-	txa                                ; +2 = 27 / 42
-	eor #$FF                           ; +2 = 29 / 44
-	adc #<(vdelay_clockslide-1)        ; +2 = 31 / 46
-	pha                                ; +3 = 34 / 49
-	rts                                ; +6 = 40 / 55 (to clockslide)
+		sbc #5                         ; +2 = 16 (counting last time only)
+		BRPAGE bcs, :-                 ; +2 = 18 (counting last time only)
+	tax                                ; +2 = 20
+	lda #>(vdelay_clockslide-1)        ; +2 = 22
+	pha                                ; +3 = 25
+	txa                                ; +2 = 27
+	eor #$FF                           ; +2 = 29
+	adc #<(vdelay_clockslide-1)        ; +2 = 31
+	pha                                ; +3 = 34
+	rts                                ; +6 = 40 (to clockslide)
 
 ; This "clockslide" overlaps instructions so that each byte adds one cycle to the tally.
 ; 0-4 cycles + 2 cycles of overhead (A clobbered)
-vdelay_clockslide:                     ; +2 = 42 / 57
+vdelay_clockslide:                     ; +2 = 42
 	.byte $A9           ; 0     LDA #$A9 (+2)
 	.byte $A9           ; 1     LDA #$A9 (+2)
 	.byte $A9           ; 0,2   LDA #$90 (+2)
@@ -53,7 +53,7 @@ vdelay_clockslide:                     ; +2 = 42 / 57
 	.assert >(vdelay_clockslide-1) = >(vdelay_clockslide+4-1), error, "Clockslide crosses page."
 	.assert >(*+$0A) = >*, error, "Clockslide branch page crossed!"
 	.assert (*+$0A) = vdelay_clockslide_branch, error, "Clockslide branch misplaced!"
-	rts                                ; +6 = 48 / 63 (end)
+	rts                                ; +6 = 48 (end)
 
 vdelay_toolow:                         ; +3 = 15 (from branch)
 	ldx #3                             ; +2 = 17
@@ -83,3 +83,4 @@ vdelay_full:                           ; +3 = 11
 vdelay_high_none:                      ; +3 = 24 (from branch)
 	tya                                ; +2 = 26
 	jmp vdelay_low                     ; +3 = 29
+	;                                -14+48 = 63 (full end)
