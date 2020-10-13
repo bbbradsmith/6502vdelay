@@ -103,13 +103,13 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_short - 56, 70.
   * vdelay_short_clockslide - 51, 48.
 * Version 7
- * vdelay - 48, 62.
- * vdelay_clockslide - obsoleted: vdelay is not a clockslide technique.
- * vdelay_modify - 35, 58.
- * vdelay_extreme - obsoleted.
- * vdelay_short - 46, 36.
- * vdelay_short_clockslide - obsoleted.
- * vdelay_short_modify - 33, 28.
+  * vdelay - 48, 62.
+  * vdelay_clockslide - obsoleted: vdelay is not a clockslide technique.
+  * vdelay_modify - 35, 58.
+  * vdelay_extreme - obsoleted.
+  * vdelay_short - 46, 36.
+  * vdelay_short_clockslide - obsoleted.
+  * vdelay_short_modify - 33, 28.
 
 ## License
 
