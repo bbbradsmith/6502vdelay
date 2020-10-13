@@ -46,25 +46,11 @@ vdelay_clockslide:                     ; +2 = 29
 	.byte $A9           ; 0     LDA #$A9 (+2)
 	.byte $A9           ; 1     LDA #$A9 (+2)
 	.byte $A9           ; 0,2   LDA #$90 (+2)
-	.byte $90           ; 1,3   BCC *+2+$0A (+3, carry guaranteed clear)
-	.byte $0A           ; 0,2,4 ASL (+2)
+	.byte $90           ; 1,3   BCC *+2+$18 (+3, carry guaranteed clear)
+	.byte $18           ; 0,2,4 CLC (+2)
 	.assert >(vdelay_clockslide) = >(vdelay_clockslide+4), error, "Clockslide crosses page."
-	.assert >(*+$0A) = >*, error, "Clockslide branch page crossed!"
-	.assert (*+$0A) = vdelay_clockslide_branch, error, "Clockslide branch misplaced!"
-	rts                                ; +6 = 35 (end)
-
-vdelay_toolow:                         ; +3 = 15 (from branch)
-	php                                ; +3 = 18
-	plp                                ; +4 = 22
-	php                                ; +3 = 25
-	plp                                ; +4 = 29
-	rts                                ; +6 = 35 (end)
-
-	nop ; padding
-	nop
-	nop
-	nop
-vdelay_clockslide_branch: ; exactly 10 bytes past the clockslide branch
+	.assert >(*+$18) = >*, error, "Clockslide branch page crossed!"
+	.assert (*+$18) = vdelay_clockslide_branch, error, "Clockslide branch misplaced!"
 	rts                                ; +6 = 35 (end)
 
 vdelay_full:                           ; +3 = 11
@@ -86,3 +72,13 @@ vdelay_high_none:                      ; +3 = 24 (from branch)
 	tya                                ; +2 = 26
 	jmp vdelay_low                     ; +3 = 29
 	;                                -14+35 = 50 (full end)
+
+vdelay_clockslide_branch: ; exactly 24 bytes past the clockslide branch
+	rts                                ; +6 = 35 (end)
+
+vdelay_toolow:                         ; +3 = 15 (from branch)
+	php                                ; +3 = 18
+	plp                                ; +4 = 22
+	php                                ; +3 = 25
+	plp                                ; +4 = 29
+	rts                                ; +6 = 35 (end)

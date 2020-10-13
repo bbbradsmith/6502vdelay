@@ -16,7 +16,7 @@ Version 7
 ## Usage
 
 * **vdelay.s** - normal version (48-65535 cycles, 62 bytes)
-* **vdelay_modify.s** - self-modifying version (35-65535 cycles, 58 bytes RAM)
+* **vdelay_modify.s** - self-modifying version (35-65535 cycles, 54 bytes RAM)
 * **vdelay_short.s** - short version (46-255 cycles, 36 bytes)
 * **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
 
@@ -109,7 +109,7 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
 * Version 7
   * vdelay - 48, 62.
   * vdelay_clockslide - obsoleted: vdelay is now a clockslide technique.
-  * vdelay_modify - 35, 58.
+  * vdelay_modify - 35, 54.
   * vdelay_extreme - obsoleted.
   * vdelay_short - 46, 36.
   * vdelay_short_clockslide - obsoleted.
