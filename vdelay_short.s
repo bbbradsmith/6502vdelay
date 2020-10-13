@@ -4,6 +4,7 @@
 ; - Fiskbit
 ; - Brad Smith
 ;
+; Version 7
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
@@ -22,10 +23,10 @@ VDELAY_MINIMUM = 46
 .align 64
 
 vdelay:                                ; +6 = 6 (jsr)
-	sec                                ; +2 = 9
+	sec                                ; +2 = 8
 	sbc #VDELAY_MINIMUM                ; +2 = 10
 	BRPAGE bcc, vdelay_toolow          ; +2 = 12
-	: ; 5 cycle countdown + 1 extra loop (carry is set on entry)
+	: ; 5 cycle countdown + 1 extra loop (carry is set on entry, clear on exit)
 		sbc #5                         ; +2 = 14 (counting last time only)
 		BRPAGE bcs, :-                 ; +2 = 16 (counting last time only)
 	tax                                ; +2 = 18
@@ -42,7 +43,7 @@ vdelay:                                ; +6 = 6 (jsr)
 vdelay_clockslide:                     ; +2 = 40
 	.byte $A9           ; 0     LDA #$A9 (+2)
 	.byte $A9           ; 1     LDA #$A9 (+2)
-	.byte $A9           ; 0,2   LDA #$A9 (+2)
+	.byte $A9           ; 0,2   LDA #$90 (+2)
 	.byte $90           ; 1,3   BCC *+2+$0A (+3, carry guaranteed clear)
 	.byte $0A           ; 0,2,4 ASL (+2)
 	.assert >(vdelay_clockslide-1) = >(vdelay_clockslide+4-1), error, "Clockslide crosses page."
@@ -57,5 +58,5 @@ vdelay_toolow:                         ; +3 = 13 (from branch)
 		dex
 		bne :-                         ; -1 = 38 (on last iteration)
 	nop                                ; +2 = 40
-vdelay_clockslide_branch: ; exactly 10 bytes from the clockslide branch
+vdelay_clockslide_branch: ; exactly 10 bytes past the clockslide branch
 	rts                                ; +6 = 46 (end)
