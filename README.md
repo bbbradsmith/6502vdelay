@@ -8,8 +8,8 @@ You might call this arbitrary delay, procedural delay, programmatic delay, varia
 Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
 Authors:
-* Brad Smith
-* [Fiskbit](http://forums.nesdev.com/viewtopic.php?p=257651#p257651)
+* [Brad Smith](http://rainwarrior.ca)
+* [Fiskbit](https://forums.nesdev.com/viewtopic.php?p=257651#p257651)
 
 Version 7
 
@@ -26,20 +26,34 @@ Assemble and include the source code in your project. It exports the **vdelay**
 
 The minimum amount of delay is currently **48 cycles**.
  If the given parameter is less than that it will still delay that minimum number of cycles.
- The cycle count includes the jsr/rts of the subroutine call,
+ The cycle count includes the JSR/RTS of the subroutine call,
  though you will probably need to account for a few extra cycles to load A/X before calling.
 
 This code must be placed in a 64-byte-aligned segment. Add **align=64** to your **CODE** segment CFG
  or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
 
 The **self-modifying** version places the code in RAM to lower the minimum.
- This is suitable for platforms where most code is run from RAM (Apple II, C64).
+ This is suitable for platforms where most code is run from RAM (e.g. Apple II, C64).
  For other platforms RAM will have to be copied to where it is needed.
  (The segment "RAMCODE" is used for testing, but any suitable run-from-RAM segment may be substituted.)
 
 The **short** versions only permit delays only up to 255, with A as its parameter.
- Their minimums are lower, and their code is smaller,
- and there may be less calling overhead because X is ignored.
+ Their minimums are slightly lower, and their code is smaller.
+ Since X is ignored, there may be less calling overhead.
+
+## Notes
+
+This code should be 65C02 compatible, as it does not use instructions that have different timings from 6502.
+
+The byte alignment requirements were chosen for ease of maintenance/use.
+ If you remove the **.align** directive, it will still ensure correct branch timing with asserts,
+ so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
+ you might be able to get away with much smaller alignment.
+
+If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time)
+ you may find Bisqwit's **fixed-cycle delay code vending machine** useful:
+
+* [https://bisqwit.iki.fi/utils/nesdelay.php](https://bisqwit.iki.fi/utils/nesdelay.php)
 
 ## Tests
 
@@ -50,30 +64,13 @@ Run **test/compile.bat** to build the test binaries.
 The [python3](https://www.python.org/) program **test/test.py** will use **sim65** to simulate the program
  with all possible parameters and logs the cycle count of each.
  (This takes a few minutes.)
- Once finished it will analyze the log to verify the measured cycles is correct.
+ Once finished it will analyze the log to verify the relative measured cycles is correct.
 
-The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code
- in an NES debugging emulator.
-
-## Algorithm and Notes
-
-This routine is built around a loop that takes 8 cycles to subtract 8 from a number.
- Before entering this loop, the number is rounded down to the nearest 8, and a jump table is used
- to select one of 8 routines to make up the difference with a suitable delay. Before doing that,
- we have subtract the cycle overhead that it takes to prepare to enter the table/loop.
- This overhead is what causes the routine to have a minimum.
-
-This code should be 65C02 compatible, as it does not use instructions that have different timings from 6502.
-
-The byte alignment requirements were chosen for ease of maintenance/use.
- If you remove the **.align** directive, it will still ensure correct branch timing with asserts,
- so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
- you might be able to get away with much smaller alignment.
-
-If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time)
- you may find Bisqwit's *fixed-cycle delay code vending machine* useful:
-
-* [https://bisqwit.iki.fi/utils/nesdelay.php](https://bisqwit.iki.fi/utils/nesdelay.php)
+The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code in an NES debugging emulator.
+ In FCEUX or Mesen emualtors you can set a breakpoint on $FE to quickly find the function entry,
+ then step over it to count its cycles. As long as you verify the length of 1 call,
+ the relative verification from the sim65 tests will ensure the rest are correct.
+ (The default is set at 64 = $0040. Press A to run the test.)
 
 ## History
 
@@ -104,7 +101,7 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
   * vdelay_short_clockslide - 51, 48.
 * Version 7
   * vdelay - 48, 62.
-  * vdelay_clockslide - obsoleted: vdelay is not a clockslide technique.
+  * vdelay_clockslide - obsoleted: vdelay is now a clockslide technique.
   * vdelay_modify - 35, 58.
   * vdelay_extreme - obsoleted.
   * vdelay_short - 46, 36.
@@ -114,10 +111,10 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
 ## License
 
 This library may be used, reused, and modified for any purpose, commercial or non-commercial.
- If distributing source code, do not remove the attribution to its original author,
+ If distributing source code, do not remove the attribution to its original authors,
  and document any modifications with attribution to their new author as well.
 
 Attribution in released binaries or documentation is appreciated but not required.
 
-If you'd like to support this project or its author, please visit:
+If you'd like to support this project or its maintainer, please visit:
  [Patreon](https://www.patreon.com/rainwarrior)
