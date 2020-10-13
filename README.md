@@ -50,6 +50,12 @@ The byte alignment requirements were chosen for ease of maintenance/use.
  so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
  you might be able to get away with much smaller alignment.
 
+The clockslide technique used can work with several different instructions.
+ Any 2-byte 2-cycle instruction that preserves the flags/registers you need can be used for the bulk of the slide.
+ The second-last instruction is a branch to avoid a spurious read from a 3-cycle ZP instruction,
+ but it means the last instruction doubles as a distance to a nearby RTS, which might be a little weird.
+ If trying to modify this code, an opcode matrix might be useful reference.
+
 If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time)
  you may find Bisqwit's **fixed-cycle delay code vending machine** useful:
 
