@@ -10,14 +10,15 @@ Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 Authors:
 * [Brad Smith](http://rainwarrior.ca)
 * [Fiskbit](https://forums.nesdev.com/viewtopic.php?p=257651#p257651)
+* [Ejona](http://forums.nesdev.com/viewtopic.php?p=258154#p258154)
 
-Version 7
+Version 8
 
 ## Usage
 
 * **vdelay.s** - normal version (48-65535 cycles, 62 bytes)
 * **vdelay_modify.s** - self-modifying version (35-65535 cycles, 54 bytes RAM)
-* **vdelay_short.s** - short version (46-255 cycles, 36 bytes)
+* **vdelay_short.s** - short version (38-255 cycles, 30 bytes)
 * **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
 
 Assemble and include the source code in your project. It exports the **vdelay**
@@ -114,6 +115,8 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
   * vdelay_short - 46, 36.
   * vdelay_short_clockslide - obsoleted.
   * vdelay_short_modify - 33, 28.
+* Version 8
+  * vdelay_short - 38, 30.
 
 ## License
 
@@ -122,6 +125,3 @@ This library may be used, reused, and modified for any purpose, commercial or no
  and document any modifications with attribution to their new author as well.
 
 Attribution in released binaries or documentation is appreciated but not required.
-
-If you'd like to support this project or its maintainer, please visit:
- [Patreon](https://www.patreon.com/rainwarrior)
