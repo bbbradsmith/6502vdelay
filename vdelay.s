@@ -48,6 +48,7 @@ vdelay_8s:
 vdelay_loop8:                          ;         (8 extra per loop, countdown)
     BRPAGE bne, vdelay_wait8           ; +2 = 34
     rts                                ; +6 = 40 (end)
+
 vdelay_wait4:
     BRPAGE bcs, vdelay_8s              ; +3 (branch always)
 vdelay_wait8:
