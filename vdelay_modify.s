@@ -11,10 +11,10 @@
 ; delays for X:A cycles, minimum: 35 (includes jsr)
 ;   A = low bits of cycles to delay
 ;   X = high bits of cycles to delay
-;   A/X/Y clobbered
+;   A/X clobbered
 
 VDELAY_MINIMUM = 35
-VDELAY_FULL_OVERHEAD = 50
+VDELAY_FULL_OVERHEAD = 53
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -56,22 +56,22 @@ vdelay_clockslide:                     ; +2 = 29
 vdelay_full:                           ; +3 = 11
     sec                                ; +2 = 13
     sbc #VDELAY_FULL_OVERHEAD          ; +2 = 15
-    tay                                ; +2 = 17
-    txa                                ; +2 = 19
-    sbc #0                             ; +2 = 21
-    BRPAGE beq, vdelay_high_none       ; +2 = 23
+    pha                                ; +3 = 18
+    txa                                ; +2 = 20
+    sbc #0                             ; +2 = 22
+    BRPAGE beq, vdelay_high_none       ; +2 = 24
     : ; 256 cycles each iteration
         ldx #50            ; +2 = 2
         : ; 5 cycle loop   +250 = 252
             dex
             BRPAGE bne, :- ; -1 = 251
         sbc #1             ; +2 = 253 (carry always set)
-        BRPAGE bne, :--    ; +3 = 256    -1 = 22 (on last iteration)
-    nop                                ; +2 = 24
-vdelay_high_none:                      ; +3 = 24 (from branch)
-    tya                                ; +2 = 26
-    jmp vdelay_low                     ; +3 = 29
-    ;                                -14+35 = 50 (full end)
+        BRPAGE bne, :--    ; +3 = 256    -1 = 23 (on last iteration)
+    nop                                ; +2 = 25
+vdelay_high_none:                      ; +3 = 25 (from branch)
+    pla                                ; +4 = 29
+    jmp vdelay_low                     ; +3 = 32
+    ;                                -14+35 = 53 (full end)
 
 vdelay_clockslide_branch: ; exactly 24 bytes past the clockslide branch
     rts                                ; +6 = 35 (end)

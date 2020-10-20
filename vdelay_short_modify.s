@@ -10,7 +10,7 @@
 .export vdelay
 ; delays for A cycles, minimum: 33 (includes jsr)
 ;   A = cycles to delay
-;   A/X clobbered
+;   A clobbered
 
 VDELAY_MINIMUM = 33
 
