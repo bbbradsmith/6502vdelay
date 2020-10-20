@@ -4,13 +4,13 @@
 ; - Fiskbit
 ; - Brad Smith
 ;
-; Version 7
+; Version 8
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
 ; delays for A cycles, minimum: 33 (includes jsr)
 ;   A = cycles to delay
-;   A/X clobbered
+;   A clobbered
 
 VDELAY_MINIMUM = 33
 

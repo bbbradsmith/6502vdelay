@@ -9,15 +9,16 @@ Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
 Authors:
 * [Brad Smith](http://rainwarrior.ca)
-* [Fiskbit](https://forums.nesdev.com/viewtopic.php?p=257651#p257651)
+* Fiskbit ([source](https://forums.nesdev.com/viewtopic.php?p=257651#p257651))
+* [Eric Anderson](https://github.com/ejona86) ([source](http://forums.nesdev.com/viewtopic.php?p=258154#p258154))
 
-Version 7
+Version 8
 
 ## Usage
 
-* **vdelay.s** - normal version (48-65535 cycles, 62 bytes)
+* **vdelay.s** - normal version (40-65535 cycles, 55 bytes)
 * **vdelay_modify.s** - self-modifying version (35-65535 cycles, 54 bytes RAM)
-* **vdelay_short.s** - short version (46-255 cycles, 36 bytes)
+* **vdelay_short.s** - short version (38-255 cycles, 30 bytes)
 * **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
 
 Assemble and include the source code in your project. It exports the **vdelay**
@@ -50,7 +51,11 @@ The byte alignment requirements were chosen for ease of maintenance/use.
  so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
  you might be able to get away with much smaller alignment.
 
-The clockslide technique used can work with several different instructions.
+The normal version works by shifting out the low 3 bits of A
+ and branching to delay an extra 1, 2, or 4 cycles if each is set.
+ Finally, with A divded by 8, it does an 8-cycle per loop countdown to finish.
+
+The self-modifying version uses a clockslide technique, which can work with several different instructions.
  Any 2-byte 2-cycle instruction that preserves the flags/registers you need can be used for the bulk of the slide.
  The second-last instruction is a branch to avoid a spurious read from a 3-cycle ZP instruction,
  but it means the last instruction doubles as a distance to a nearby RTS, which might be a little weird.
@@ -114,6 +119,11 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
   * vdelay_short - 46, 36.
   * vdelay_short_clockslide - obsoleted.
   * vdelay_short_modify - 33, 28.
+* Version 8
+  * vdelay - 40, 55. Y not clobbered.
+  * vdelay_modify - Y not clobbered.
+  * vdelay_short - 38, 30. X not clobbered.
+  * vdelay_short_modify - X not clobbered.
 
 ## License
 
@@ -122,6 +132,3 @@ This library may be used, reused, and modified for any purpose, commercial or no
  and document any modifications with attribution to their new author as well.
 
 Attribution in released binaries or documentation is appreciated but not required.
-
-If you'd like to support this project or its maintainer, please visit:
- [Patreon](https://www.patreon.com/rainwarrior)
