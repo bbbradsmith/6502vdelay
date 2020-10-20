@@ -123,7 +123,7 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
   * vdelay - 40, 56. Y not clobbered.
   * vdelay_modify - Y not clobbered.
   * vdelay_short - 38, 30. X not clobbered.
-  * vdelay_short - X not clobbered.
+  * vdelay_short_modify - X not clobbered.
 
 ## License
 
