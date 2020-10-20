@@ -21,7 +21,7 @@ VDELAY_MINIMUM = 38
     .assert >(label_) = >*, error, "Page crossed!"
 .endmacro
 
-.align 64
+.align 32
 
 vdelay:                                ; +6 = 6 (jsr)
     sec                                ; +2 = 8
@@ -35,7 +35,7 @@ vdelay_low:
     BRPAGE bcs, vdelay_2s              ; +2 = 19 (1 extra if bit 1 set)
 vdelay_2s:
     lsr                                ; +2 = 21
-    BRPAGE bcc, vdelay_4s              ; +2 = 24 (2 extra if bit 2 set)
+    BRPAGE bcc, vdelay_4s              ; +3 = 24 (2 extra if bit 2 set)
     BRPAGE bcs, vdelay_4s              ; +3 (branch always)
 vdelay_4s:
     lsr                                ; +2 = 26
@@ -44,7 +44,7 @@ vdelay_8s:
     sec                                ; +2 = 30
 vdelay_loop8:                          ;         (8 extra per loop, countdown)
     BRPAGE bne, vdelay_wait8           ; +2 = 32
-    rts                                ; +6 = 38
+    rts                                ; +6 = 38 (end)
 vdelay_wait4:
     BRPAGE bcs, vdelay_8s              ; +3 (branch always)
 vdelay_wait8:

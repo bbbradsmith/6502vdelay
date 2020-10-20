@@ -16,7 +16,7 @@ Version 8
 
 ## Usage
 
-* **vdelay.s** - normal version (48-65535 cycles, 62 bytes)
+* **vdelay.s** - normal version (40-65535 cycles, 56 bytes)
 * **vdelay_modify.s** - self-modifying version (35-65535 cycles, 54 bytes RAM)
 * **vdelay_short.s** - short version (38-255 cycles, 30 bytes)
 * **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
@@ -51,7 +51,11 @@ The byte alignment requirements were chosen for ease of maintenance/use.
  so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
  you might be able to get away with much smaller alignment.
 
-The clockslide technique used can work with several different instructions.
+The normal version works by shifting out the low 3 bits of A
+ and branching to delay an extra 1, 2, or 4 cycles if each is set.
+ Finally, with A divded by 8, it does an 8-cycle per loop countdown to finish.
+
+The self-modifying version uses a clockslide technique, which can work with several different instructions.
  Any 2-byte 2-cycle instruction that preserves the flags/registers you need can be used for the bulk of the slide.
  The second-last instruction is a branch to avoid a spurious read from a 3-cycle ZP instruction,
  but it means the last instruction doubles as a distance to a nearby RTS, which might be a little weird.
@@ -116,7 +120,8 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
   * vdelay_short_clockslide - obsoleted.
   * vdelay_short_modify - 33, 28.
 * Version 8
-  * vdelay_short - 38, 30.
+  * vdelay - 40, 56. Y not clobbered.
+  * vdelay_short - 38, 30. X not clobbered.
 
 ## License
 
