@@ -4,7 +4,7 @@
 ; - Fiskbit
 ; - Brad Smith
 ;
-; Version 7
+; Version 8
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
