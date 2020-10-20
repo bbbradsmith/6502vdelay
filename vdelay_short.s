@@ -1,7 +1,7 @@
 ; vdelay (short version)
 ;
 ; Authors:
-; - Ejona
+; - Eric Anderson
 ; - Fiskbit
 ; - Brad Smith
 ;

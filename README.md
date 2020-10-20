@@ -9,8 +9,8 @@ Uses ca65 ([cc65](https://cc65.github.io/)) assembly syntax.
 
 Authors:
 * [Brad Smith](http://rainwarrior.ca)
-* [Fiskbit](https://forums.nesdev.com/viewtopic.php?p=257651#p257651)
-* [Ejona](http://forums.nesdev.com/viewtopic.php?p=258154#p258154)
+* Fiskbit ([source](https://forums.nesdev.com/viewtopic.php?p=257651#p257651))
+* [Eric Anderson](https://github.com/ejona86) ([source](http://forums.nesdev.com/viewtopic.php?p=258154#p258154))
 
 Version 8
 
