@@ -14,7 +14,7 @@
 ;   X = high bits of cycles to delay
 ;   A/X clobbered (A/X=0)
 
-VDELAY_MINIMUM = 40
+VDELAY_MINIMUM = 37
 VDELAY_FULL_OVERHEAD = 53
 
 ; assert to make sure branches do not page-cross
@@ -30,25 +30,26 @@ vdelay:                                ; +6 = 6 (jsr)
     BRPAGE bne, vdelay_full            ; +2 = 10
     sbc #VDELAY_MINIMUM                ; +2 = 12
     BRPAGE bcc, vdelay_toolow          ; +2 = 14
-    BRPAGE bcs, vdelay_low             ; +3 = 17 (branch taken)
-vdelay_toolow:
-    lda #0                             ; +2
 vdelay_low:
-    lsr                                ; +2 = 19
-    BRPAGE bcs, vdelay_2s              ; +2 = 21 (1 extra if bit 1 set)
+    lsr                                ; +2 = 16
+    BRPAGE bcs, vdelay_2s              ; +2 = 18 (1 extra if bit 1 set)
 vdelay_2s:
-    lsr                                ; +2 = 23
-    BRPAGE bcc, vdelay_4s              ; +3 = 26 (2 extra if bit 2 set)
+    lsr                                ; +2 = 20
+vdelay_toolow_resume:
+    BRPAGE bcc, vdelay_4s              ; +3 = 23 (2 extra if bit 2 set)
     BRPAGE bcs, vdelay_4s              ; +3 (branch always)
 vdelay_4s:
-    lsr                                ; +2 = 28
-    BRPAGE bcs, vdelay_wait4           ; +2 = 30 (4 extra if bit 3 set)
+    lsr                                ; +2 = 25
+    BRPAGE bcs, vdelay_wait4           ; +2 = 27 (4 extra if bit 3 set)
 vdelay_8s:
-    sec                                ; +2 = 32
+    sec                                ; +2 = 29
 vdelay_loop8:                          ;         (8 extra per loop, countdown)
-    BRPAGE bne, vdelay_wait8           ; +2 = 34
-    rts                                ; +6 = 40 (end)
+    BRPAGE bne, vdelay_wait8           ; +2 = 31
+    rts                                ; +6 = 37 (end)
 
+vdelay_toolow:
+    lda #0                             ; +2
+    BRPAGE bcc, vdelay_toolow_resume   ; +3 (branch always)
 vdelay_wait4:
     BRPAGE bcs, vdelay_8s              ; +3 (branch always)
 vdelay_wait8:
@@ -72,4 +73,4 @@ vdelay_full:                           ; +3 = 11 (carry is set)
 vdelay_high_none:                      ; +3 = 23 (from branch)
     pla                                ; +4 = 27
     jmp vdelay_low                     ; +3 = 30
-    ;                                -17+40 = 53 (full end)
+    ;                                -14+37 = 53 (full end)

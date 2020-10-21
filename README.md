@@ -16,9 +16,9 @@ Version 8
 
 ## Usage
 
-* **vdelay.s** - normal version (40-65535 cycles, 55 bytes)
+* **vdelay.s** - normal version (37-65535 cycles, 55 bytes)
 * **vdelay_modify.s** - self-modifying version (35-65535 cycles, 54 bytes RAM)
-* **vdelay_short.s** - short version (38-255 cycles, 30 bytes)
+* **vdelay_short.s** - short version (35-255 cycles, 30 bytes)
 * **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
 
 Assemble and include the source code in your project. It exports the **vdelay**
@@ -120,9 +120,9 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
   * vdelay_short_clockslide - obsoleted.
   * vdelay_short_modify - 33, 28.
 * Version 8
-  * vdelay - 40, 55. Y not clobbered.
+  * vdelay - 37, 55. Y not clobbered.
   * vdelay_modify - Y not clobbered.
-  * vdelay_short - 38, 30. X not clobbered.
+  * vdelay_short - 35, 30. X not clobbered.
   * vdelay_short_modify - X not clobbered.
 
 ## License
