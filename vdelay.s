@@ -5,17 +5,17 @@
 ; - Brad Smith
 ; - Fiskbit
 ;
-; Version 8
+; Version 9
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
-; delays for X:A cycles, minimum: 40 (includes jsr)
+; delays for X:A cycles, minimum: 36 (includes jsr)
 ;   A = low bits of cycles to delay
 ;   X = high bits of cycles to delay
 ;   A/X clobbered (A/X=0)
 
-VDELAY_MINIMUM = 37
-VDELAY_FULL_OVERHEAD = 53
+VDELAY_MINIMUM = 36
+VDELAY_FULL_OVERHEAD = 52
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -40,21 +40,25 @@ vdelay_toolow_resume:
     BRPAGE bcs, vdelay_4s              ; +3 (branch always)
 vdelay_4s:
     lsr                                ; +2 = 25
-    BRPAGE bcs, vdelay_wait4           ; +2 = 27 (4 extra if bit 3 set)
-vdelay_8s:
-    sec                                ; +2 = 29
-vdelay_loop8:                          ;         (8 extra per loop, countdown)
-    BRPAGE bne, vdelay_wait8           ; +2 = 31
-    rts                                ; +6 = 37 (end)
+    BRPAGE bcc, vdelay_8s              ; +3 = 28
+    clc                                ; +2 (-1 bcc not taken)
+    BRPAGE bcc, vdelay_8s              ; +3 (+2+3-1 = 4 extra if bit 4 set)
+vdelay_8s:                             ; (8 extra per loop, countdown)
+    BRPAGE bne, vdelay_wait8_clc       ; +2 = 30 (+1 if braching)
+    rts                                ; +6 = 36 (end)
+vdelay_wait8_clc:
+    sbc #0                             ; +2 (carry is clear, subtract 1 less)
+    BRPAGE bcs, vdelay_loop8           ; +3 (branch always, A>=0)
+vdelay_wait8_sec:
+    sbc #1                             ; +2 (carry is set, sutract 1)
+    BRPAGE bcs, vdelay_loop8           ; +3 (branch always, A>=0)
+vdelay_loop8:
+    BRPAGE bne, vdelay_wait8_sec       ; +3 (-1 if ending = 28)
+    rts                                ; +6 = 36 (end)
 
 vdelay_toolow:
-    lda #0                             ; +2
-    BRPAGE bcc, vdelay_toolow_resume   ; +3 (branch always)
-vdelay_wait4:
-    BRPAGE bcs, vdelay_8s              ; +3 (branch always)
-vdelay_wait8:
-    sbc #1                             ; +2
-    BRPAGE bcs, vdelay_loop8           ; +3 (branch always)
+    lda #0                             ; +2 = 17
+    BRPAGE bcc, vdelay_toolow_resume   ; +3 = 20 (branch always)
 
 vdelay_full:                           ; +3 = 11 (carry is set)
     sbc #VDELAY_FULL_OVERHEAD          ; +2 = 13
@@ -73,4 +77,4 @@ vdelay_full:                           ; +3 = 11 (carry is set)
 vdelay_high_none:                      ; +3 = 23 (from branch)
     pla                                ; +4 = 27
     jmp vdelay_low                     ; +3 = 30
-    ;                                -14+37 = 53 (full end)
+    ;                                -14+36 = 52 (full end)

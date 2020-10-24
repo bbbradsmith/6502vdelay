@@ -4,7 +4,7 @@
 ; - Brad Smith
 ; - Fiskbit
 ;
-; Version 8
+; Version 9
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
@@ -73,7 +73,7 @@ vdelay_high_none:                      ; +3 = 23 (from branch)
     ;                                -14+35 = 51 (full end)
 
     nop ; padding
-vdelay_clockslide_branch: ; exactly 24 bytes past the clockslide branch
+vdelay_clockslide_branch: ; exactly 24=$18 bytes past the clockslide branch
     rts                                ; +6 = 35 (end)
 
 vdelay_toolow:                         ; +3 = 15 (from branch)

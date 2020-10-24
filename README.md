@@ -12,20 +12,24 @@ Authors:
 * Fiskbit ([source](https://forums.nesdev.com/viewtopic.php?p=257651#p257651))
 * [Eric Anderson](https://github.com/ejona86) ([source](http://forums.nesdev.com/viewtopic.php?p=258154#p258154))
 
-Version 8
+Version 9
 
 ## Usage
 
-* **vdelay.s** - normal version (37-65535 cycles, 55 bytes)
+* **vdelay.s** - normal version (36-65535 cycles, 62 bytes)
+* **vdelay_short.s** - short version (34-255 cycles, 37 bytes)
+
 * **vdelay_modify.s** - self-modifying version (35-65535 cycles, 54 bytes RAM)
-* **vdelay_short.s** - short version (35-255 cycles, 30 bytes)
 * **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
+
+* **vdelay_extreme** - self-modifying extreme version (31-255 cycles, 297 RAM or 23+283 RAM+ROM)
+* **vdelay_short_extreme.s** - short self-modifying extreme version (27-255 cycles, 254 RAM or 16+240 RAM+ROM)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
  Low bits in **A**, high bits in **X**.
 
-The minimum amount of delay is currently **48 cycles**.
+The minimum amount of delay is currently **36 cycles**.
  If the given parameter is less than that it will still delay that minimum number of cycles.
  The cycle count includes the JSR/RTS of the subroutine call,
  though you will probably need to account for a few extra cycles to load A/X before calling.
@@ -41,6 +45,8 @@ The **self-modifying** version places the code in RAM to lower the minimum.
 The **short** versions only permit delays only up to 255, with A as its parameter.
  Their minimums are slightly lower, and their code is smaller.
  Since X is ignored, there may be less calling overhead.
+
+The **extreme** version uses a larger code size to lower the minimum cycles.
 
 ## Notes
 
@@ -60,6 +66,8 @@ The self-modifying version uses a clockslide technique, which can work with seve
  The second-last instruction is a branch to avoid a spurious read from a 3-cycle ZP instruction,
  but it means the last instruction doubles as a distance to a nearby RTS, which might be a little weird.
  If trying to modify this code, an opcode matrix might be useful reference.
+
+The extreme version uses a much larger clockslide that is aligned to a page to lower the overhead further.
 
 If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time)
  you may find Bisqwit's **fixed-cycle delay code vending machine** useful:
@@ -124,6 +132,11 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
   * vdelay_modify - Y not clobbered.
   * vdelay_short - 35, 30. X not clobbered.
   * vdelay_short_modify - X not clobbered.
+* Version 9
+  * vdelay - 36, 62.
+  * vdelay_short - 34, 37.
+  * vdelay_extreme - 31, 297/23+283.
+  * vdelay_short_extreme - 27, 254/16+240.
 
 ## License
 

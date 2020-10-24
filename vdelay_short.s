@@ -5,15 +5,15 @@
 ; - Fiskbit
 ; - Brad Smith
 ;
-; Version 8
+; Version 9
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
-; delays for A cycles, minimum: 35 (includes jsr)
+; delays for A cycles, minimum: 34 (includes jsr)
 ;   A = cycles to delay
 ;   A clobbered (A=0)
 
-VDELAY_MINIMUM = 35
+VDELAY_MINIMUM = 34
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -36,18 +36,22 @@ vdelay_toolow_resume:
     BRPAGE bcs, vdelay_4s              ; +3 (branch always)
 vdelay_4s:
     lsr                                ; +2 = 23
-    BRPAGE bcs, vdelay_wait4           ; +2 = 25 (4 extra if bit 3 set)
-vdelay_8s:
-    sec                                ; +2 = 27
-vdelay_loop8:                          ;         (8 extra per loop, countdown)
-    BRPAGE bne, vdelay_wait8           ; +2 = 29
-    rts                                ; +6 = 35 (end)
+    BRPAGE bcc, vdelay_8s              ; +3 = 26
+    clc                                ; +2 (-1 bcc not taken)
+    BRPAGE bcc, vdelay_8s              ; +3 (+2+3-1 = 4 extra if bit 4 set)
+vdelay_8s:                             ; (8 extra per loop, countdown)
+    BRPAGE bne, vdelay_wait8_clc       ; +2 = 28 (+1 if braching)
+    rts                                ; +6 = 34 (end)
+vdelay_wait8_clc:
+    sbc #0                             ; +2 (carry is clear, subtract 1 less)
+    BRPAGE bcs, vdelay_loop8           ; +3 (branch always, A>=0)
+vdelay_wait8_sec:
+    sbc #1                             ; +2 (carry is set, sutract 1)
+    BRPAGE bcs, vdelay_loop8           ; +3 (branch always, A>=0)
+vdelay_loop8:
+    BRPAGE bne, vdelay_wait8_sec       ; +3 (-1 if ending = 28)
+    rts                                ; +6 = 34 (end)
 
 vdelay_toolow:
-    lda #0                             ; +2
-    BRPAGE bcc, vdelay_toolow_resume   ; +3 (branch always)
-vdelay_wait4:
-    BRPAGE bcs, vdelay_8s              ; +3 (branch always)
-vdelay_wait8:
-    sbc #1                             ; +2
-    BRPAGE bcs, vdelay_loop8           ; +3 (branch always)
+    lda #0                             ; +2 = 15
+    BRPAGE bcc, vdelay_toolow_resume   ; +3 = 18 (branch always)

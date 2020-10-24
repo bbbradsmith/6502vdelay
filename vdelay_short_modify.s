@@ -4,7 +4,7 @@
 ; - Fiskbit
 ; - Brad Smith
 ;
-; Version 8
+; Version 9
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
@@ -24,7 +24,7 @@ VDELAY_MINIMUM = 33
 
 .segment "RAMCODE"
 
-vdelay_clockslide_branch: ; exactly 22 bytes before the clockslide branch
+vdelay_clockslide_branch: ; exactly 22=-$EA bytes before the clockslide branch
     rts
 
 vdelay:                                ; +6 = 6 (jsr)
