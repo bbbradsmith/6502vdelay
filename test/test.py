@@ -3,7 +3,7 @@
 # https://github.com/bbbradsmith/6502vdelay
 #
 # This will test every input value of vdelay.
-# It generates a batch file with 65536 command lines to run sim65.
+# It generates a batch file with 65537 command lines to run sim65.
 # It redirects the cycle count output to a log file.
 # The log file is then parsed and compared.
 # For each line, it compares the current cycle count against the previous,
