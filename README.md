@@ -91,10 +91,9 @@ The [python3](https://www.python.org/) program **test/test.py** will use **sim65
 
 The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code in an NES debugging emulator.
  In FCEUX or Mesen emualtors you can set a read breakpoint on $FE to quickly find the function entry,
- then step over it to count its cycles.
- As long as you verify the length of 1 call,
- the relative verification from the sim65 tests will ensure the rest are correct.
- (The default is set at 64 = $0040. Press A to run the test.)
+ then step over it to count its cycles, or step into it for debugging.
+ Use the gamepad to set the parameter (the default is set at 64 = $0040),
+ and press A to run the test.
 
 ## History
 
