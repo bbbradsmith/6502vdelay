@@ -90,7 +90,7 @@ The [python3](https://www.python.org/) program **test/test.py** will use **sim65
  Once finished it will analyze the log to verify the relative measured cycles is correct.
 
 The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code in an NES debugging emulator.
- In FCEUX or Mesen emualtors you can set a read breakpoint on $FE to quickly find the function entry,
+ In FCEUX or Mesen emulators you can set a read breakpoint on $FE to quickly find the function entry,
  then step over it to count its cycles, or step into it for debugging.
  Use the gamepad to set the parameter (the default is set at 64 = $0040),
  and press A to run the test.
