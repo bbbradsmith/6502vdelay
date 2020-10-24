@@ -16,14 +16,18 @@ Version 9
 
 ## Usage
 
+Full range:
+
 * **vdelay.s** - normal version (36-65535 cycles, 62 bytes)
-* **vdelay_short.s** - short version (34-255 cycles, 37 bytes)
-
 * **vdelay_modify.s** - self-modifying version (35-65535 cycles, 54 bytes RAM)
-* **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
-
 * **vdelay_extreme** - self-modifying extreme version (31-255 cycles, 297 RAM or 23+283 RAM+ROM)
+
+Short range:
+
+* **vdelay_short.s** - short version (34-255 cycles, 37 bytes)
+* **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
 * **vdelay_short_extreme.s** - short self-modifying extreme version (27-255 cycles, 254 RAM or 16+240 RAM+ROM)
+
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
@@ -42,11 +46,11 @@ The **self-modifying** version places the code in RAM to lower the minimum.
  For other platforms RAM will have to be copied to where it is needed.
  (The segment "RAMCODE" is used for testing, but any suitable run-from-RAM segment may be substituted.)
 
+The **extreme** version uses a larger code size to lower the minimum cycles.
+
 The **short** versions only permit delays only up to 255, with A as its parameter.
  Their minimums are slightly lower, and their code is smaller.
  Since X is ignored, there may be less calling overhead.
-
-The **extreme** version uses a larger code size to lower the minimum cycles.
 
 ## Notes
 
