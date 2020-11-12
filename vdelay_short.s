@@ -44,6 +44,6 @@ vdelay_low:                            ; +1 = 13 (bcc)
     adc #3                             ; +2 = 15
     BRPAGE bcc, @0  ;  3 2 2 2  <0 00 01 02
     BRPAGE beq, @0  ;  - 3 2 3  -- 00 01 02
-    lsr             ;  - - 2 2  -- -- 00 01
+           lsr      ;  - - 2 2  -- -- 00 01
 @0: BRPAGE bne, *+2 ;  3 2 2 3  <0 00 00 01
     rts                                ; +6 = 27 (end < 31)
