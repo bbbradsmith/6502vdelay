@@ -16,16 +16,16 @@
 
 conhex: ; convert 0123456789ABCDEF ASCII to hex in consistent cycle count
 	cmp #'A'
-	BRPAGE bcs, @upper
-	NOP3
-	sec
-	sbc #'0'
-	rts
-@upper:
-	nop
-	sec
-	sbc #('A'-10)
-	rts
+	BRPAGE bcs, @upper ; +2 (unbranched)
+	NOP3               ; +3
+	sec                ; +2
+	sbc #'0'           ; +2
+	rts                ; +6 = 15
+@upper:                ; +3 (branched)
+	nop                ; +2
+	sec                ; +2
+	sbc #('A'-10)      ; +2
+	rts                ; +6 = 15
 
 incptr1: ; increment the pointer instead of INY to prevent page crossings
 	inc ptr1+0
@@ -75,14 +75,14 @@ _test: ; decode arguments in a consistent cycle count, run vdelay
 	pha
 	lda (ptr1), Y
 	beq :+   ; +2 (unbranched)
-	    NOP3 ; +3 = 5
-	    pla
-	    rts
+	    NOP3 ; +3
+	    pla  ; +4
+	    rts  ; +6 = 15
 	:        ; +3 (branched)
-	nop      ; +2 = 5
-	pla
+	nop      ; +2
+	pla      ; +4
 	jsr vdelay ; X:A = argument
-	rts
+	rts      ; +6 = 15
 
 .segment "RAMCODE"
 ; empty placeholder

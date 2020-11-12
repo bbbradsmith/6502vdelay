@@ -15,19 +15,7 @@ REM if you wish to test alternative versions, uncomment them to replace vdelay.s
 cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay.s
 @IF ERRORLEVEL 1 GOTO error
 
-REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_modify.s
-@IF ERRORLEVEL 1 GOTO error
-
-REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_extreme.s
-@IF ERRORLEVEL 1 GOTO error
-
 REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_short.s
-@IF ERRORLEVEL 1 GOTO error
-
-REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_short_modify.s
-@IF ERRORLEVEL 1 GOTO error
-
-REM cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay_short_extreme.s
 @IF ERRORLEVEL 1 GOTO error
 
 cc65\bin\ca65 -o temp\test.o -g test.s

@@ -11,42 +11,26 @@ Authors:
 * [Brad Smith](http://rainwarrior.ca)
 * Fiskbit ([source](https://forums.nesdev.com/viewtopic.php?p=257651#p257651))
 * [Eric Anderson](https://github.com/ejona86) ([source](http://forums.nesdev.com/viewtopic.php?p=258154#p258154))
+* [Joel Yliluoma](https://bisqwit.iki.fi/) ([source](https://wiki.nesdev.com/w/index.php/Delay_code))
 
-Version 9
+Version 10
 
 ## Usage
 
-Full range:
-
-* **vdelay.s** - normal version (36-65535 cycles, 62 bytes)
-* **vdelay_modify.s** - self-modifying version (35-65535 cycles, 54 bytes RAM)
-* **vdelay_extreme** - self-modifying extreme version (31-255 cycles, 297 RAM or 23+283 RAM+ROM)
-
-Short range:
-
-* **vdelay_short.s** - short version (34-255 cycles, 37 bytes)
-* **vdelay_short_modify.s** - short self-modifying version (33-255 cycles, 28 bytes RAM)
-* **vdelay_short_extreme.s** - short self-modifying extreme version (27-255 cycles, 254 RAM or 16+240 RAM+ROM)
-
+* **vdelay.s** - normal version (29-65535 cycles, 55 bytes)
+* **vdelay_short.s** - short version (27-255 cycles, 30 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
  subroutine, which you call with a 16-bit value for the number of cycles to delay.
  Low bits in **A**, high bits in **X**.
 
-The minimum amount of delay is currently **36 cycles**.
+The minimum amount of delay is currently **29 cycles**.
  If the given parameter is less than that it will still delay that minimum number of cycles.
  The cycle count includes the JSR/RTS of the subroutine call,
  though you will probably need to account for a few extra cycles to load A/X before calling.
 
 This code must be placed in a 64-byte-aligned segment. Add **align=64** to your **CODE** segment CFG
  or add a **.segment** directive of your own to place it in a custom segment that is appropriately aligned.
-
-The **self-modifying** version places the code in RAM to lower the minimum.
- This is suitable for platforms where most code is run from RAM (e.g. Apple II, C64).
- For other platforms RAM will have to be copied to where it is needed.
- (The segment "RAMCODE" is used for testing, but any suitable run-from-RAM segment may be substituted.)
-
-The **extreme** version uses a larger code size to lower the minimum cycles.
 
 The **short** versions only permit delays only up to 255, with A as its parameter.
  Their minimums are slightly lower, and their code is smaller.
@@ -61,22 +45,12 @@ The byte alignment requirements were chosen for ease of maintenance/use.
  so if you are extremely cramped for space and willing to experiment with a few bytes of internal padding
  you might be able to get away with much smaller alignment.
 
-The normal version works by shifting out the low 3 bits of A
- and branching to delay an extra 1, 2, or 4 cycles if each is set.
- Finally, with A divded by 8, it does an 8-cycle per loop countdown to finish.
+If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time),
+ or want to investigate other alternative, you may find these articles and tools written by Bisqwit useful:
 
-The self-modifying version uses a clockslide technique, which can work with several different instructions.
- Any 2-byte 2-cycle instruction that preserves the flags/registers you need can be used for the bulk of the slide.
- The second-last instruction is a branch to avoid a spurious read from a 3-cycle ZP instruction,
- but it means the last instruction doubles as a distance to a nearby RTS, which might be a little weird.
- If trying to modify this code, an opcode matrix might be useful reference.
-
-The extreme version uses a much larger clockslide that is aligned to a page to lower the overhead further.
-
-If you need hard-coded delays of specific lengths (i.e. decided at compile-time, not run-time)
- you may find Bisqwit's **fixed-cycle delay code vending machine** useful:
-
-* [https://bisqwit.iki.fi/utils/nesdelay.php](https://bisqwit.iki.fi/utils/nesdelay.php)
+* [NESDev Wiki: Fixed cycle delay](https://wiki.nesdev.com/w/index.php/Fixed_cycle_delay) (minimal-size fixed-cycle delays)
+* [NESDev Wiki: Delay code](https://wiki.nesdev.com/w/index.php/Delay_code) (collection of variable-delay methods)
+* [NES 6502 / RP2A03 / RP2A07 fixed-cycle delay code vending machine](https://bisqwit.iki.fi/utils/nesdelay.php)
 
 ## Tests
 
@@ -140,6 +114,13 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
   * vdelay_short - 34, 37.
   * vdelay_extreme - 31, 297/23+283.
   * vdelay_short_extreme - 27, 254/16+240.
+* Version 10
+  * vdelay - 29, 55.
+  * vdelay_modify - obsoleted.
+  * vdelay_extreme - obsoleted.
+  * vdelay_short - 27, 30.
+  * vdelay_short_modify - obsoleted.
+  * vdelay_short_extreme - obsoleted.
 
 ## License
 
