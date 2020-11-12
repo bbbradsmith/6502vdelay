@@ -32,7 +32,7 @@ vdelay:                                ; +6 = 6 (jsr)
     sbc #VDELAY_MINIMUM+4              ; +2 = 12
     BRPAGE bcc, vdelay_low             ; +2 = 14
 vdelay_full_return:
-    ; 5-cycle coundown loop + 6 paths   +19 = 33 (carry is set on entry)
+    ; 5-cycle coundown loop + 5 paths   +19 = 33 (carry is set on entry)
 @L:        sbc #5
     BRPAGE bcs, @L  ;  6 6 6 6 6  FB FC FD FE FF
            adc #3   ;  2 2 2 2 2  FE FF 00 01 02

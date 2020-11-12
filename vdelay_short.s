@@ -28,7 +28,7 @@ vdelay:                                ; +6 = 6 (jsr)
     sec                                ; +2 = 8
     sbc #VDELAY_MINIMUM+4              ; +2 = 10
     BRPAGE bcc, vdelay_low             ; +2 = 12
-    ; 5-cycle coundown loop + 6 paths   +19 = 31 (end >= 31)
+    ; 5-cycle coundown loop + 5 paths   +19 = 31 (end >= 31)
 @L:        sbc #5
     BRPAGE bcs, @L  ;  6 6 6 6 6  FB FC FD FE FF
            adc #3   ;  2 2 2 2 2  FE FF 00 01 02
