@@ -49,8 +49,8 @@ vdelay_low:                            ; +1 = 15 (bcc)
     BRPAGE bcc, @0  ;  3 2 2 2  <0 00 01 02
     BRPAGE beq, @0  ;  - 3 2 3  -- 00 01 02
            lsr      ;  - - 2 2  -- -- 00 01
-@0: BRPAGE bne, *+2 ;  3 2 2 3  <0 00 00 01
-    rts                                ; +6 = 29 (end < 33)
+@0: BRPAGE bne, @1  ;  3 2 2 3  <0 00 00 01
+@1: rts                                ; +6 = 29 (end < 33)
 
 vdelay_full:                           ; +3 = 11 (carry is set)
     sbc #VDELAY_FULL_OVERHEAD          ; +2 = 13
