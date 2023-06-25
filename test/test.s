@@ -74,13 +74,13 @@ _test: ; decode arguments in a consistent cycle count, run vdelay
 	jsr incptr1
 	pha
 	lda (ptr1), Y
-	beq :+   ; +2 (unbranched)
-	    NOP3 ; +3
-	    pla  ; +4
-	    rts  ; +6 = 15
-	:        ; +3 (branched)
-	nop      ; +2
-	pla      ; +4
+	BRPAGE beq, :+ ; +2 (unbranched)
+	    NOP3       ; +3
+	    pla        ; +4
+	    rts        ; +6 = 15
+	:              ; +3 (branched)
+	nop            ; +2
+	pla            ; +4
 	jsr vdelay ; X:A = argument
 	rts      ; +6 = 15
 
