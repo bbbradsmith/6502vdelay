@@ -16,7 +16,7 @@
 ;   A/X clobbered (X=0)
 
 VDELAY_MINIMUM = 29
-VDELAY_FULL_OVERHEAD = 49
+VDELAY_FULL_OVERHEAD = 34
 
 ; assert to make sure branches do not page-cross
 .macro BRPAGE instruction_, label_
@@ -27,9 +27,9 @@ VDELAY_FULL_OVERHEAD = 49
 .align 64
 
 vdelay:                                ; +6 = 6 (jsr)
-    cpx #0                             ; +2 = 8 (sets carry)
+           cpx #0                      ; +2 = 8 (sets carry)
     BRPAGE bne, vdelay_full            ; +2 = 10
-    sbc #VDELAY_MINIMUM+4              ; +2 = 12
+           sbc #VDELAY_MINIMUM+4       ; +2 = 12
     BRPAGE bcc, vdelay_low             ; +2 = 14
 vdelay_full_return:
     ; 5-cycle coundown loop + 5 paths   +19 = 33 (carry is set on entry)
@@ -45,28 +45,19 @@ vdelay_full_return:
 
 ; 29-32 cycles handled separately
 vdelay_low:                            ; +1 = 15 (bcc)
-    adc #3                             ; +2 = 17
+           adc #3                      ; +2 = 17
     BRPAGE bcc, @0  ;  3 2 2 2  <0 00 01 02
     BRPAGE beq, @0  ;  - 3 2 3  -- 00 01 02
            lsr      ;  - - 2 2  -- -- 00 01
 @0: BRPAGE bne, @1  ;  3 2 2 3  <0 00 00 01
-@1: rts                                ; +6 = 29 (end < 33)
+@1:        rts                    ; +6 = 29 (end < 33)
 
-vdelay_full:                           ; +3 = 11 (carry is set)
-    sbc #VDELAY_FULL_OVERHEAD          ; +2 = 13
-    pha                                ; +3 = 16
-    txa                                ; +2 = 18
-    sbc #0                             ; +2 = 20
-    BRPAGE beq, vdelay_high_none       ; +2 = 22
-    : ; 256 cycles each iteration
-        ldx #50            ; +2 = 2
-        : ; 5 cycle loop   +250 = 252
-            dex
-            BRPAGE bne, :- ; -1 = 251
-        sbc #1             ; +2 = 253 (carry always set)
-        BRPAGE bne, :--    ; +3 = 256    -1 = 21 (on last iteration)
-    nop                                ; +2 = 23
-vdelay_high_none:                      ; +3 = 23 (from branch)
-    pla                                ; +4 = 27
-    jmp vdelay_full_return             ; +3 = 30 (carry always set)
-    ;                                -14+33 = 49
+vdelay_full:
+           ; We enter a loop that burns and subtracts 5 or 11 cycles during each traversal.
+           sbc #5                           ; Carry is set, here.
+    BRPAGE bcs, vdelay_full
+           sbc #(6 - 1)                     ; We want to subtract 6, but carry is clear, here.
+           dex
+    BRPAGE bne, vdelay_full
+           sbc  #VDELAY_FULL_OVERHEAD       ; Carry is set, here.
+    BRPAGE bcs, vdelay_full_return          ; Carry is set, here.
