@@ -40,14 +40,14 @@ vdelay_full_return:
            lsr      ;  - - 2 2 2  -- -- 00 00 01
     BRPAGE beq, @5  ;  - - 3 3 2  -- -- 00 00 01
 @4:        lsr      ;  2 2 - - 2  7F 7F -- -- 00
-@5: BRPAGE bcs, @6  ;  2 3 2 3 2  7F 7F 00 00 00
+@5: BRPAGE bcs, @6  ;  2 3 2 3 3  7F 7F 00 00 00
 @6:        rts      ;  6 6 6 6 6                 (end >= 33)
 
 ; 29-32 cycles handled separately
 vdelay_low:                            ; +1 = 15 (bcc)
     adc #3                             ; +2 = 17
     BRPAGE bcc, @0  ;  3 2 2 2  <0 00 01 02
-    BRPAGE beq, @0  ;  - 3 2 3  -- 00 01 02
+    BRPAGE beq, @0  ;  - 3 2 2  -- 00 01 02
            lsr      ;  - - 2 2  -- -- 00 01
 @0: BRPAGE bne, @1  ;  3 2 2 3  <0 00 00 01
 @1: rts                                ; +6 = 29 (end < 33)
