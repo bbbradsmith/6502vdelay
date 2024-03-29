@@ -56,14 +56,31 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
 
 ## Tests
 
-Place **cc65** in **test/cc65** and create a **test/temp** folder.
+Place **cc65** in **test/cc65** and create a **test/temp** folder. **[python3](https://www.python.org/)** is also required.
 
-Run **test/compile.bat** to build the test binaries.
+Run **test/test.bat** to build and test the binaries. Alternatively, run **make** in the **test/** folder.
 
-The [python3](https://www.python.org/) program **test/test.py** will use **sim65** to simulate the program
- with all possible parameters and logs the cycle count of each.
- (This takes a few minutes.)
- Once finished it will analyze the log to verify the relative measured cycles is correct.
+These will build test binaries, and an NES ROM, then will begin running tests of each. Full tests will typically take several minutes. A correct test will look something like this:
+
+```
+----- NULL: 1447
+    0 0000: 29
+    1 0001: 0
+   30 001E: 1
+count: 65536
+```
+
+Each line of the results shows:
+* The input value in decimal
+* The input value in hexadecimal
+* The cycle difference between this test and the previous one
+
+Any test where the difference was the same as the previous test is omitted, therefore we should see:
+* 1 line of the NULL test, giving a baseline cycle count. (Any value is OK.)
+* 1 line for input 0 showing the minimum delay value.
+* 1 line for input 1 with a value of 0, indicating that the delay is always equal to the minimum whenever the input is less than it.
+* 1 line for the minimum delay + 1 with a value of 1, indicating that once the minimum is reached, each test is 1 more cycle than the preceding one.
+* A final count of 65536 (or 256 for the short test).
 
 The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code in an NES debugging emulator.
  In FCEUX or Mesen emulators you can set a read breakpoint on $FE to quickly find the function entry,
@@ -71,9 +88,7 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
  Use the gamepad to set the parameter (the default is set at 64 = $0040),
  and press A to run the test.
 
-Alternatively **make** can be used to run **test/makefile**, which will compile the test and also run
-it using **make_test.py**. (This substitutes for **compile.bat** and **test.py**.)
-This version will also run the test cases in parallel.
+See **test/test.bat** or **test/makefile** for other run options.
 
 ## History
 
