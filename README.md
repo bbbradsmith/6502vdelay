@@ -88,7 +88,7 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
  Use the gamepad to set the parameter (the default is set at 64 = $0040),
  and press A to run the test.
 
-See **test/test.bat** or **test/makefile** for other run options.
+See **test/test.bat** or **test/makefile** for other run options, like abbreviated testing for iteration.
 
 ## History
 
@@ -149,7 +149,8 @@ See **test/test.bat** or **test/makefile** for other run options.
 ## License
 
 This library may be used, reused, and modified for any purpose, commercial or non-commercial.
- If distributing source code, do not remove the attribution to its original authors,
+
+If distributing source code, please do not remove the attribution to its original authors,
  and document any modifications with attribution to their new author as well.
 
 Attribution in released binaries or documentation is appreciated but not required.
