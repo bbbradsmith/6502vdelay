@@ -12,8 +12,10 @@ Authors:
 * Fiskbit ([source](https://forums.nesdev.com/viewtopic.php?p=257651#p257651))
 * [Eric Anderson](https://github.com/ejona86) ([source](http://forums.nesdev.com/viewtopic.php?p=258154#p258154))
 * [Joel Yliluoma](https://bisqwit.iki.fi/) ([source](https://wiki.nesdev.com/w/index.php/Delay_code))
+* [George Foot](https://github.com/gfoot) ([issue](https://github.com/bbbradsmith/6502vdelay/issues/6))
+* [Sidney Cadot](https://github.com/sidneycadot) ([PR](https://github.com/bbbradsmith/6502vdelay/pull/4))
 
-Version 10
+Version 11
 
 ## Usage
 
@@ -121,6 +123,9 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
   * vdelay_short - 27, 30.
   * vdelay_short_modify - obsoleted.
   * vdelay_short_extreme - obsoleted.
+* Version 11
+  * vdelay - 29, 46.
+  * vdelay_short - 27, 30 - unchanged.
 
 ## License
 
