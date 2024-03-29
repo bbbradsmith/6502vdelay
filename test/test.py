@@ -25,13 +25,12 @@ import sys
 import os
 import subprocess
 
-TEMP = "temp\\"
 SIM65 = "cc65\\bin\\sim65 -c "
 
 def create_bat(testname,count):
-    bat = TEMP + testname + ".bat"
-    log = TEMP + testname + ".log"
-    run = SIM65 + TEMP + testname + ".bin"
+    bat = testname + ".bat"
+    log = testname + ".log"
+    run = SIM65 + testname + ".bin"
     try:
         os.remove(bat)
     except:
@@ -46,8 +45,8 @@ def create_bat(testname,count):
     print("Test batch created: " + bat)
 
 def run_bat(testname):
-    bat = TEMP + testname + ".bat"
-    log = TEMP + testname + ".log"
+    bat = testname + ".bat"
+    log = testname + ".log"
     try:
         os.remove(log)
     except:
@@ -56,7 +55,7 @@ def run_bat(testname):
     subprocess.call(bat)
 
 def read_log(testname):
-    log = TEMP + testname + ".log"
+    log = testname + ".log"
     print("Test batch result: " + log)
     logged = open(log,"rt").readlines()
     ls = logged[0].split()
@@ -78,9 +77,9 @@ def read_log(testname):
 
 def printargs():
     print("Usage: test.py [mode] [test name] [count]")
-    print("  test.py bat test 65536 -> generates test batch files for test.bin")
-    print("  test.py run test -> use bat mode first, runs test and prints log")
-    print("  test.py log test -> reprints log from past test run")
+    print("  test.py bat temp\test 65536 -> generates test batch files for test.bin")
+    print("  test.py run temp\test -> use bat mode first, runs test and prints log")
+    print("  test.py log temp\test -> reprints log from past test run")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

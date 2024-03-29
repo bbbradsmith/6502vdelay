@@ -56,9 +56,11 @@ If you need hard-coded delays of specific lengths (i.e. decided at compile-time,
 
 ## Tests
 
-Place **cc65** in **test/cc65** and create a **test/temp** folder. **[python3](https://www.python.org/)** is also required.
+Prerequisites:
+* Place **[cc65](https://cc65.github.io)** in **test/cc65/**.
+* **[python3](https://www.python.org/)** is also required.
 
-Run **test/test.bat** to build and test the binaries. Alternatively, run **make** in the **test/** folder.
+Run **test.bat** in the **test/** folder to build and test the binaries to **test/temp/**. Alternatively, run **make** in the **test/** folder.
 
 These will build test binaries, and an NES ROM, then will begin running tests of each. Full tests will typically take several minutes. A correct test will look something like this:
 
@@ -71,9 +73,9 @@ count: 65536
 ```
 
 Each line of the results shows:
-* The input value in decimal
-* The input value in hexadecimal
-* The cycle difference between this test and the previous input (input-1, not the previous result line)
+* The input value in decimal.
+* The input value in hexadecimal.
+* The cycle difference between this test and the previous input (input-1, not the previous result line).
 
 Any test where the difference was the same as the previous test is omitted, therefore we should see:
 * 1 line for the NULL test, giving a baseline cycle count. (Any value is OK.)

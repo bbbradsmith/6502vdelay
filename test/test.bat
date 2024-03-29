@@ -1,53 +1,60 @@
+REM temporary output directory
+SET OUTDIR=temp\
+
 REM full test
-SET /A count = 65536
+SET /A COUNT = 65536
 
 @REM abbreviated test
-@REM SET /A count = 1000
+@REM SET /A COUNT = 1000
 
-REM Clean temp directory
+REM Set up and clean temp directory
 
-@del temp\* /Q
+IF NOT EXIST %OUTDIR% md %OUTDIR%
+del %OUTDIR%* /Q
 
 
 REM Test code
 
-cc65\bin\ca65 -o temp\vdelay.o -g ..\vdelay.s
+cc65\bin\ca65 -o %OUTDIR%vdelay.o -g ..\vdelay.s
 @IF ERRORLEVEL 1 GOTO error
 
-cc65\bin\ca65 -o temp\vdelay_short.o -g ..\vdelay_short.s
+cc65\bin\ca65 -o %OUTDIR%vdelay_short.o -g ..\vdelay_short.s
 @IF ERRORLEVEL 1 GOTO error
 
-cc65\bin\ca65 -o temp\test.o -g test.s
+cc65\bin\ca65 -o %OUTDIR%test.o -g test.s
 @IF ERRORLEVEL 1 GOTO error
 
-cc65\bin\ca65 -o temp\test_nes.o -g test_nes.s
+cc65\bin\ca65 -o %OUTDIR%test_nes.o -g test_nes.s
 @IF ERRORLEVEL 1 GOTO error
 
-cc65\bin\cc65 -o temp\test.c.s -T -O -g test.c
+cc65\bin\cc65 -o %OUTDIR%test.c.s -T -O -g test.c
 @IF ERRORLEVEL 1 GOTO error
 
-cc65\bin\ca65 -o temp\test.c.o -g temp\test.c.s
+cc65\bin\ca65 -o %OUTDIR%test.c.o -g %OUTDIR%test.c.s
 @IF ERRORLEVEL 1 GOTO error
 
 REM 6502 simulation
 
-cc65\bin\ld65 -o temp\test.bin -C test.cfg -m temp\test.map temp\vdelay.o temp\test.o temp\test.c.o sim6502.lib
+cc65\bin\ld65 -o %OUTDIR%test.bin -C test.cfg -m %OUTDIR%test.map %OUTDIR%vdelay.o %OUTDIR%test.o %OUTDIR%test.c.o sim6502.lib
 @IF ERRORLEVEL 1 GOTO error
 
-cc65\bin\ld65 -o temp\test_short.bin -C test.cfg -m temp\test_short.map temp\vdelay_short.o temp\test.o temp\test.c.o sim6502.lib
+cc65\bin\ld65 -o %OUTDIR%test_short.bin -C test.cfg -m %OUTDIR%test_short.map %OUTDIR%vdelay_short.o %OUTDIR%test.o %OUTDIR%test.c.o sim6502.lib
 @IF ERRORLEVEL 1 GOTO error
 
 REM 65C02 simulation
 
-cc65\bin\ld65 -o temp\testc.bin -C test.cfg -m temp\testc.map temp\vdelay.o temp\test.o temp\test.c.o sim65C02.lib
+cc65\bin\ld65 -o %OUTDIR%testc.bin -C test.cfg -m %OUTDIR%testc.map %OUTDIR%vdelay.o %OUTDIR%test.o %OUTDIR%test.c.o sim65C02.lib
 @IF ERRORLEVEL 1 GOTO error
 
-cc65\bin\ld65 -o temp\testc_short.bin -C test.cfg -m temp\testc_short.map temp\vdelay_short.o temp\test.o temp\test.c.o sim65C02.lib
+cc65\bin\ld65 -o %OUTDIR%testc_short.bin -C test.cfg -m %OUTDIR%testc_short.map %OUTDIR%vdelay_short.o %OUTDIR%test.o %OUTDIR%test.c.o sim65C02.lib
 @IF ERRORLEVEL 1 GOTO error
 
 REM NES demo
 
-cc65\bin\ld65 -o temp\test_nes.nes -C test_nes.cfg --dbgfile temp\test_nes.dbg -m temp\test_nes.map temp\vdelay.o temp\test_nes.o
+cc65\bin\ld65 -o %OUTDIR%test_nes.nes -C test_nes.cfg --dbgfile %OUTDIR%test_nes.dbg -m %OUTDIR%test_nes.map %OUTDIR%vdelay.o %OUTDIR%test_nes.o
+@IF ERRORLEVEL 1 GOTO error
+
+cc65\bin\ld65 -o %OUTDIR%test_short_nes.nes -C test_nes.cfg --dbgfile %OUTDIR%test_short_nes.dbg -m %OUTDIR%test_short_nes.map %OUTDIR%vdelay_short.o %OUTDIR%test_nes.o
 @IF ERRORLEVEL 1 GOTO error
 
 @echo.
@@ -56,10 +63,10 @@ cc65\bin\ld65 -o temp\test_nes.nes -C test_nes.cfg --dbgfile temp\test_nes.dbg -
 @echo.
 @echo.
 
-test.py bat test_short 256
-test.py bat test %count%
-test.py bat testc_short 256
-test.py bat testc %count%
+test.py bat %OUTDIR%test_short 256
+test.py bat %OUTDIR%test %COUNT%
+test.py bat %OUTDIR%testc_short 256
+test.py bat %OUTDIR%testc %COUNT%
 
 @echo.
 @echo.
@@ -67,10 +74,10 @@ test.py bat testc %count%
 @echo.
 @echo.
 
-test.py run test_short
-test.py run test
-test.py run testc_short
-test.py run testc
+test.py run %OUTDIR%test_short
+test.py run %OUTDIR%test
+test.py run %OUTDIR%testc_short
+test.py run %OUTDIR%testc
 
 @echo.
 @echo.
@@ -78,10 +85,10 @@ test.py run testc
 @echo.
 @echo.
 
-test.py log test_short
-test.py log test
-test.py log testc_short
-test.py log testc
+test.py log %OUTDIR%test_short
+test.py log %OUTDIR%test
+test.py log %OUTDIR%testc_short
+test.py log %OUTDIR%testc
 
 @echo.
 @echo.
