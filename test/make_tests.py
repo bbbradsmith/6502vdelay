@@ -53,16 +53,19 @@ def main() -> None:
     parser.add_argument("--max", type=int, default=65535, help="maximum value to test")
     parser.add_argument("--sim65-executable", type=str, default="sim65", help="path to the sim65 executable")
     parser.add_argument("--test-program", type=str, default="temp/test.bin", help="path to the 6502 program to be tested")
+    parser.add_argument("--processes", type=int, default=0, help="multiprocess limit, 0 for maximum")
 
     args = parser.parse_args()
+    print("make_test: {} {} {:d}-{:d} x{:d}".format(args.sim65_executable,args.test_program,args.min,args.max,args.processes));
 
     # Prepare and run the tests.
 
     actual_testcases = list(range(args.min, args.max + 1))
     all_testcases = [None] + actual_testcases
 
+
     sim65_driver = Sim65Driver(args.sim65_executable, args.test_program)
-    with multiprocessing.Pool() as pool:
+    with multiprocessing.Pool(None if args.processes == 0 else args.processes) as pool:
         results = pool.map(sim65_driver.run_testcase, all_testcases)
 
     null_testcase_cycles = results[0]
