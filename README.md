@@ -19,7 +19,7 @@ Version 11
 
 ## Usage
 
-* **vdelay.s** - normal version (29-65535 cycles, 55 bytes)
+* **vdelay.s** - normal version (29-65535 cycles, 46 bytes)
 * **vdelay_short.s** - short version (27-255 cycles, 30 bytes)
 
 Assemble and include the source code in your project. It exports the **vdelay**
@@ -73,10 +73,10 @@ count: 65536
 Each line of the results shows:
 * The input value in decimal
 * The input value in hexadecimal
-* The cycle difference between this test and the previous one
+* The cycle difference between this test and the previous input (input-1, not the previous result line)
 
 Any test where the difference was the same as the previous test is omitted, therefore we should see:
-* 1 line of the NULL test, giving a baseline cycle count. (Any value is OK.)
+* 1 line for the NULL test, giving a baseline cycle count. (Any value is OK.)
 * 1 line for input 0 showing the minimum delay value.
 * 1 line for input 1 with a value of 0, indicating that the delay is always equal to the minimum whenever the input is less than it.
 * 1 line for the minimum delay + 1 with a value of 1, indicating that once the minimum is reached, each test is 1 more cycle than the preceding one.
