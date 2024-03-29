@@ -13,7 +13,7 @@ Authors:
 * [Eric Anderson](https://github.com/ejona86) ([source](http://forums.nesdev.com/viewtopic.php?p=258154#p258154))
 * [Joel Yliluoma](https://bisqwit.iki.fi/) ([source](https://wiki.nesdev.com/w/index.php/Delay_code))
 * [George Foot](https://github.com/gfoot) ([issue](https://github.com/bbbradsmith/6502vdelay/issues/6))
-* [Sidney Cadot](https://github.com/sidneycadot) ([PR](https://github.com/bbbradsmith/6502vdelay/pull/4))
+* [Sidney Cadot](https://github.com/sidneycadot) ([PR](https://github.com/bbbradsmith/6502vdelay/pull/4), [PR](https://github.com/bbbradsmith/6502vdelay/pull/5))
 
 Version 11
 
@@ -70,6 +70,10 @@ The NES ROM compiled to **test/temp/test_nes.nes** can be used to test the code 
  then step over it to count its cycles, or step into it for debugging.
  Use the gamepad to set the parameter (the default is set at 64 = $0040),
  and press A to run the test.
+
+Alternatively **make** can be used to run **test/makefile**, which will compile the test and also run
+it using **make_test.py**. (This substitutes for **compile.bat** and **test.py**.)
+This version will also run the test cases in parallel.
 
 ## History
 
