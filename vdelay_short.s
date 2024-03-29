@@ -1,12 +1,14 @@
 ; vdelay (short version)
 ;
 ; Authors:
-; - Eric Anderson
-; - Joel Yliluoma
 ; - Brad Smith
 ; - Fiskbit
+; - Eric Anderson
+; - Joel Yliluoma
+; - George Foot
+; - Sidney Cadot
 ;
-; Version 10
+; Version 11
 ; https://github.com/bbbradsmith/6502vdelay
 
 .export vdelay
