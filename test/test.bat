@@ -63,10 +63,10 @@ cc65\bin\ld65 -o %OUTDIR%test_short_nes.nes -C test_nes.cfg --dbgfile %OUTDIR%te
 @echo.
 @echo.
 
-test.py bat %OUTDIR%test_short 256
-test.py bat %OUTDIR%test %COUNT%
-test.py bat %OUTDIR%testc_short 256
-test.py bat %OUTDIR%testc %COUNT%
+python test.py bat %OUTDIR%test_short 256
+python test.py bat %OUTDIR%test %COUNT%
+python test.py bat %OUTDIR%testc_short 256
+python test.py bat %OUTDIR%testc %COUNT%
 
 @echo.
 @echo.
@@ -74,10 +74,10 @@ test.py bat %OUTDIR%testc %COUNT%
 @echo.
 @echo.
 
-test.py run %OUTDIR%test_short
-test.py run %OUTDIR%test
-test.py run %OUTDIR%testc_short
-test.py run %OUTDIR%testc
+python test.py run %OUTDIR%test_short
+python test.py run %OUTDIR%test
+python test.py run %OUTDIR%testc_short
+python test.py run %OUTDIR%testc
 
 @echo.
 @echo.
@@ -85,10 +85,10 @@ test.py run %OUTDIR%testc
 @echo.
 @echo.
 
-test.py log %OUTDIR%test_short
-test.py log %OUTDIR%test
-test.py log %OUTDIR%testc_short
-test.py log %OUTDIR%testc
+python test.py log %OUTDIR%test_short
+python test.py log %OUTDIR%test
+python test.py log %OUTDIR%testc_short
+python test.py log %OUTDIR%testc
 
 @echo.
 @echo.
